@@ -16,9 +16,13 @@ var summaries = new[]
 
 CSRedisCoreBuilder.AddMultipleRedisInstance("ii", opt =>
 {
-    opt.Host = "server.lycoris.cloud";
-    opt.Port = 8471;
-    opt.Password = "Yt@6JhDEoaTZVFAm";
+    opt.Host = "your redis host";
+    opt.Port = 6379;
+
+    // redis6.0以上设置了用户名密码的情况下需要填写，其他情况不需要填写
+    //opt.UserName = "your redis username";
+
+    opt.Password = "your redis password";
     opt.SSL = false;
     // 是否尝试集群模式，阿里云、腾讯云集群需要设置此选项为 false
     opt.TestCluster = false;
@@ -26,9 +30,13 @@ CSRedisCoreBuilder.AddMultipleRedisInstance("ii", opt =>
 
 CSRedisCoreBuilder.AddMultipleRedisInstance("i2", opt =>
 {
-    opt.Host = "server.lycoris.cloud";
-    opt.Port = 8471;
-    opt.Password = "Yt@6JhDEoaTZVFAm";
+    opt.Host = "your redis host";
+    opt.Port = 6379;
+
+    // redis6.0以上设置了用户名密码的情况下需要填写，其他情况不需要填写
+    //opt.UserName = "your redis username";
+
+    opt.Password = "your redis password";
     opt.UseDatabase = 1;
     opt.SSL = false;
     // 是否尝试集群模式，阿里云、腾讯云集群需要设置此选项为 false
