@@ -182,5 +182,10 @@ namespace Lycoris.CSRedisCore.Extensions
                 return _Utils;
             }
         }
+
+        /// <summary>
+        /// CSRedis 原本的Client
+        /// </summary>
+        public static CSRedisClient CSRedisClient => Client;
     }
 }

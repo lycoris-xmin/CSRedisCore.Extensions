@@ -4,6 +4,7 @@ using Lycoris.CSRedisCore.Extensions.Services.Impl;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions
@@ -200,6 +201,11 @@ namespace Lycoris.CSRedisCore.Extensions
         /// <param name="func"></param>
         /// <returns></returns>
         public async Task<string> CacheShell(string key, TimeSpan span, Func<Task<string>> func) => await Command.CacheShellAsync(key, (int)span.TotalSeconds, func);
+
+        /// <summary>
+        /// CSRedis 原本的Client
+        /// </summary>
+        public CSRedisClient CSRedisClient => this.Command;
 
         /// <summary>
         /// 释放资源
