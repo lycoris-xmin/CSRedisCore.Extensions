@@ -127,6 +127,18 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <summary>
         /// 通过分数返回有序集合指定区间内的成员
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="count"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        Dictionary<T, decimal> GetRangeBySourceWithScores<T>(string key, decimal min, decimal max, long? count = null, long offset = 0) where T : class;
+
+        /// <summary>
+        /// 通过分数返回有序集合指定区间内的成员
+        /// </summary>
         /// <param name="key"></param>
         /// <param name="min"></param>
         /// <param name="max"></param>
@@ -134,6 +146,64 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="offset"></param>
         /// <returns></returns>
         Task<Dictionary<string, decimal>> GetRangeBySourceWithScoresAsync(string key, decimal min, decimal max, long? count = null, long offset = 0);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="count"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        Task<Dictionary<T, decimal>> GetRangeBySourceWithScoresAsync<T>(string key, decimal min, decimal max, long? count = null, long offset = 0) where T : class;
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count">返回多少成员</param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        Dictionary<string, decimal> GetRevRangeByScoreWithScores(string key, decimal max, decimal min, long? count = null, long offset = 0);
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        Dictionary<T, decimal> GetRevRangeByScoreWithScores<T>(string key, decimal max, decimal min, long? count = null, long offset = 0) where T : class;
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count">返回多少成员</param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, decimal>> GetRevRangeByScoreWithScoresAsync(string key, decimal max, decimal min, long? count = null, long offset = 0);
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        Task<Dictionary<T, decimal>> GetRevRangeByScoreWithScoresAsync<T>(string key, decimal max, decimal min, long? count = null, long offset = 0) where T : class;
 
         /// <summary>
         /// [redis-server 5.0.0] 删除并返回有序集合key中的最多count个具有最高得分的成员。如未指定，count的默认值为1。指定一个大于有序集合的基数的count不会产生错误。
@@ -179,7 +249,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        string[] Min(string key, long count);
+        string[] Min(string key, long count = 1);
 
         /// <summary>
         /// [redis-server 5.0.0] 删除并返回有序集合key中的最多count个具有最低得分的成员。如未指定，count的默认值为1。指定一个大于有序集合的基数的count不会产生错误。
@@ -188,7 +258,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        T[] Min<T>(string key, long count) where T : class;
+        T[] Min<T>(string key, long count = 1) where T : class;
 
         /// <summary>
         /// [redis-server 5.0.0] 删除并返回有序集合key中的最多count个具有最低得分的成员。如未指定，count的默认值为1。指定一个大于有序集合的基数的count不会产生错误。
@@ -197,7 +267,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        Task<string[]> MinAsync(string key, long count);
+        Task<string[]> MinAsync(string key, long count = 1);
 
         /// <summary>
         /// [redis-server 5.0.0] 删除并返回有序集合key中的最多count个具有最低得分的成员。如未指定，count的默认值为1。指定一个大于有序集合的基数的count不会产生错误。
@@ -206,6 +276,22 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        Task<T[]> MinAsync<T>(string key, long count) where T : class;
+        Task<T[]> MinAsync<T>(string key, long count = 1) where T : class;
+
+        /// <summary>
+        /// 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        long? Rank(string key, string member);
+
+        /// <summary>
+        /// 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        Task<long?> RankAsync(string key, string member);
     }
 }

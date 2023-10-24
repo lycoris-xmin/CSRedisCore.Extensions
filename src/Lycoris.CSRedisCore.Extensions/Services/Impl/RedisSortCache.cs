@@ -162,6 +162,28 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="count"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
+        public Dictionary<T, decimal> GetRangeBySourceWithScores<T>(string key, decimal min, decimal max, long? count = null, long offset = 0) where T : class
+        {
+            var cache = CSRedisCore.ZRangeByScoreWithScores<T>(key, min, max, count, offset);
+            if (cache == null || cache.Length == 0)
+                return new Dictionary<T, decimal>();
+
+            var dic = new Dictionary<T, decimal>();
+            foreach (var (member, score) in cache)
+                dic.Add(member, score);
+
+            return dic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// 通过分数返回有序集合指定区间内的成员
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="count"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
         public async Task<Dictionary<string, decimal>> GetRangeBySourceWithScoresAsync(string key, decimal min, decimal max, long? count = null, long offset = 0)
         {
             var cache = await CSRedisCore.ZRangeByScoreWithScoresAsync(key, min, max, count, offset);
@@ -169,6 +191,116 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return new Dictionary<string, decimal>();
 
             var dic = new Dictionary<string, decimal>();
+            foreach (var (member, score) in cache)
+                dic.Add(member, score);
+
+            return dic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// 通过分数返回有序集合指定区间内的成员
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="count"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<T, decimal>> GetRangeBySourceWithScoresAsync<T>(string key, decimal min, decimal max, long? count = null, long offset = 0) where T : class
+        {
+            var cache = await CSRedisCore.ZRangeByScoreWithScoresAsync<T>(key, min, max, count, offset);
+            if (cache == null || cache.Length == 0)
+                return new Dictionary<T, decimal>();
+
+            var dic = new Dictionary<T, decimal>();
+            foreach (var (member, score) in cache)
+                dic.Add(member, score);
+
+            return dic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count">返回多少成员</param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public Dictionary<string, decimal> GetRevRangeByScoreWithScores(string key, decimal max, decimal min, long? count = null, long offset = 0)
+        {
+            var cache = CSRedisCore.ZRevRangeByScoreWithScores(key, max, min, count, offset);
+            if (cache == null || cache.Length == 0)
+                return new Dictionary<string, decimal>();
+
+            var dic = new Dictionary<string, decimal>();
+            foreach (var (member, score) in cache)
+                dic.Add(member, score);
+
+            return dic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count">返回多少成员</param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public Dictionary<T, decimal> GetRevRangeByScoreWithScores<T>(string key, decimal max, decimal min, long? count = null, long offset = 0) where T : class
+        {
+            var cache = CSRedisCore.ZRevRangeByScoreWithScores<T>(key, max, min, count, offset);
+            if (cache == null || cache.Length == 0)
+                return new Dictionary<T, decimal>();
+
+            var dic = new Dictionary<T, decimal>();
+            foreach (var (member, score) in cache)
+                dic.Add(member, score);
+
+            return dic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count">返回多少成员</param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, decimal>> GetRevRangeByScoreWithScoresAsync(string key, decimal max, decimal min, long? count = null, long offset = 0)
+        {
+            var cache = await CSRedisCore.ZRevRangeByScoreWithScoresAsync(key, max, min, count, offset);
+            if (cache == null || cache.Length == 0)
+                return new Dictionary<string, decimal>();
+
+            var dic = new Dictionary<string, decimal>();
+            foreach (var (member, score) in cache)
+                dic.Add(member, score);
+
+            return dic.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        /// <summary>
+        /// 返回有序集中指定分数区间内的成员和分数，分数从高到低排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="max"></param>
+        /// <param name="min"></param>
+        /// <param name="count">返回多少成员</param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<T, decimal>> GetRevRangeByScoreWithScoresAsync<T>(string key, decimal max, decimal min, long? count = null, long offset = 0) where T : class
+        {
+            var cache = await CSRedisCore.ZRevRangeByScoreWithScoresAsync<T>(key, max, min, count, offset);
+            if (cache == null || cache.Length == 0)
+                return new Dictionary<T, decimal>();
+
+            var dic = new Dictionary<T, decimal>();
             foreach (var (member, score) in cache)
                 dic.Add(member, score);
 
@@ -238,7 +370,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public string[] Min(string key, long count)
+        public string[] Min(string key, long count = 1)
         {
             var cache = CSRedisCore.ZPopMin(key, count);
             return cache.Select(x => x.member).ToArray();
@@ -251,7 +383,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public T[] Min<T>(string key, long count) where T : class
+        public T[] Min<T>(string key, long count = 1) where T : class
         {
             var cache = CSRedisCore.ZPopMin(key, count);
             return cache?.Select(x => JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
@@ -259,11 +391,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
         /// <summary>
         /// [redis-server 5.0.0] 删除并返回有序集合key中的最多count个具有最低得分的成员。如未指定，count的默认值为1。指定一个大于有序集合的基数的count不会产生错误。
-        /// 当返回多个元素时候，得分最低的元素将是第一个元素，然后是分数较高的元素。        /// </summary>
+        /// 当返回多个元素时候，得分最低的元素将是第一个元素，然后是分数较高的元素。   
+        /// </summary>
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<string[]> MinAsync(string key, long count)
+        public async Task<string[]> MinAsync(string key, long count = 1)
         {
             var cache = await CSRedisCore.ZPopMinAsync(key, count);
             return cache?.Select(x => x.member).ToArray();
@@ -276,10 +409,26 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="key"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<T[]> MinAsync<T>(string key, long count) where T : class
+        public async Task<T[]> MinAsync<T>(string key, long count = 1) where T : class
         {
             var cache = await CSRedisCore.ZPopMinAsync(key, count);
             return cache?.Select(x => JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
         }
+
+        /// <summary>
+        /// 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        public long? Rank(string key, string member) => CSRedisCore.ZRevRank(key, member);
+
+        /// <summary>
+        /// 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        public Task<long?> RankAsync(string key, string member) => CSRedisCore.ZRevRankAsync(key, member);
     }
 }
