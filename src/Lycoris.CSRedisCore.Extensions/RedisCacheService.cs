@@ -4,7 +4,6 @@ using Lycoris.CSRedisCore.Extensions.Services.Impl;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions

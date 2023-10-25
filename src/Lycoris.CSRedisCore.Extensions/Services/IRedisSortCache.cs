@@ -293,5 +293,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="member"></param>
         /// <returns></returns>
         Task<long?> RankAsync(string key, string member);
+
+        /// <summary>
+        /// 返回指定成员的分数值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        decimal? GetScore(string key, string member);
+
+        /// <summary>
+        /// 返回指定成员的分数值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        Task<decimal?> GetScoreAsync(string key, string member);
     }
 }

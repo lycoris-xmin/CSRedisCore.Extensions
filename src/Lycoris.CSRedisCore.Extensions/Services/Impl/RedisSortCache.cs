@@ -430,5 +430,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="member"></param>
         /// <returns></returns>
         public Task<long?> RankAsync(string key, string member) => CSRedisCore.ZRevRankAsync(key, member);
+
+        /// <summary>
+        /// 返回指定成员的分数值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        public decimal? GetScore(string key, string member) => CSRedisCore.ZScore(key, member);
+
+        /// <summary>
+        /// 返回指定成员的分数值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        public Task<decimal?> GetScoreAsync(string key, string member) => CSRedisCore.ZScoreAsync(key, member);
     }
 }
