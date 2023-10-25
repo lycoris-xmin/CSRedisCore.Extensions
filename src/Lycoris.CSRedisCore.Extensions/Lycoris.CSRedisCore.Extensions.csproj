@@ -9,6 +9,7 @@
     <Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
     <PackageIcon>lycoris-nuget-logo.png</PackageIcon>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/lycoris-xmin/CSRedisCore.Extensions</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
