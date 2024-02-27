@@ -10,6 +10,7 @@
     <PackageIcon>lycoris-nuget-logo.png</PackageIcon>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/lycoris-xmin/CSRedisCore.Extensions</RepositoryUrl>
+    <Authors>Lycoris</Authors>
   </PropertyGroup>
 
   <ItemGroup>
