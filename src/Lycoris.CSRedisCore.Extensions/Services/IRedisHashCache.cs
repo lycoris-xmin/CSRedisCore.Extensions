@@ -76,6 +76,40 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         Task<T> GetAsync<T>(string key, string fieId) where T : class;
 
         /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        List<string> Get(string key, params string[] fieIds);
+
+        /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        Task<List<string>> GetAsync(string key, params string[] fieIds);
+
+        /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        List<T> Get<T>(string key, params string[] fieIds) where T : class;
+
+        /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        Task<List<T>> GetAsync<T>(string key, params string[] fieIds) where T : class;
+
+        /// <summary>
         /// 获取在哈希表中指定 key 的所有字段和值
         /// </summary>
         /// <param name="key"></param>
@@ -136,14 +170,14 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        bool Set(string key, params object[] value);
+        bool Set(string key, params (string, string)[] value);
 
         /// <summary>
         /// 同时将多个 field-value (域-值)对设置到哈希表 key 中
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        Task<bool> SetAsync(string key, params object[] value);
+        Task<bool> SetAsync<T>(string key, params (string, T)[] value) where T : class;
 
         /// <summary>
         /// 将哈希表 key 中的字段 field 的值设为 value 。

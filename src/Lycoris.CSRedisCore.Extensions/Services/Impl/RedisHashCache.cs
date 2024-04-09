@@ -107,6 +107,76 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        public List<string> Get(string key, params string[] fieIds)
+        {
+            var cache = CSRedisCore.HMGet(key, fieIds);
+            return cache?.ToList() ?? new List<string>();
+        }
+
+        /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetAsync(string key, params string[] fieIds)
+        {
+            var cache = await CSRedisCore.HMGetAsync(key, fieIds);
+            return cache?.ToList() ?? new List<string>();
+        }
+
+        /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        public List<T> Get<T>(string key, params string[] fieIds) where T : class
+        {
+            var cache = CSRedisCore.HMGet(key, fieIds);
+            if (cache == null || cache.Length == 0)
+                return null;
+
+            var result = new List<T>();
+
+            foreach (var item in cache)
+            {
+                result.Add(JsonConvert.DeserializeObject<T>(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取存储在哈希表中指定字段的值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="fieIds"></param>
+        /// <returns></returns>
+        public async Task<List<T>> GetAsync<T>(string key, params string[] fieIds) where T : class
+        {
+            var cache = await CSRedisCore.HMGetAsync(key, fieIds);
+            if (cache == null || cache.Length == 0)
+                return null;
+
+            var result = new List<T>();
+
+            foreach (var item in cache)
+            {
+                result.Add(JsonConvert.DeserializeObject<T>(item));
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 获取在哈希表中指定 key 的所有字段和值
         /// </summary>
         /// <param name="key"></param>
@@ -194,14 +264,36 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool Set(string key, params object[] value) => CSRedisCore.HMSet(key, value);
+        public bool Set(string key, params (string, string)[] value)
+        {
+            var keyValues = new List<object>();
+
+            foreach (var item in value)
+            {
+                keyValues.Add(item.Item1);
+                keyValues.Add(item.Item2);
+            }
+
+            return CSRedisCore.HMSet(key, keyValues.ToArray());
+        }
 
         /// <summary>
         /// 同时将多个 field-value (域-值)对设置到哈希表 key 中
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public async Task<bool> SetAsync(string key, params object[] value) => await CSRedisCore.HMSetAsync(key, value);
+        public async Task<bool> SetAsync<T>(string key, params (string, T)[] value) where T : class
+        {
+            var keyValues = new List<object>();
+
+            foreach (var item in value)
+            {
+                keyValues.Add(item.Item1);
+                keyValues.Add(item.Item2 != null ? JsonConvert.SerializeObject(item.Item2) : "");
+            }
+
+            return await CSRedisCore.HMSetAsync(key, keyValues.ToArray());
+        }
 
         /// <summary>
         /// 将哈希表 key 中的字段 field 的值设为 value 。
