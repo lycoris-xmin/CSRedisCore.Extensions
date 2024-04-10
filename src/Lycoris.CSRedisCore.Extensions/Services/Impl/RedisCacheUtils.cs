@@ -256,6 +256,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             var str = CSRedisCore.LPop(key);
+
+            if (string.IsNullOrEmpty(str))
+                return default;
+
             return JsonConvert.DeserializeObject<T>(str, JsonSetting);
         }
 
@@ -270,6 +274,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             var str = await CSRedisCore.LPopAsync(key);
+
+            if (string.IsNullOrEmpty(str))
+                return default;
+
             return JsonConvert.DeserializeObject<T>(str, JsonSetting);
         }
 
