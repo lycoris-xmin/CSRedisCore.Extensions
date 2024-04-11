@@ -51,7 +51,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 throw new ArgumentNullException(nameof(key));
 
             var val = CSRedisCore.Get(key);
-            return string.IsNullOrEmpty(val) ? null : JsonConvert.DeserializeObject<T>(val, JsonSetting);
+            return string.IsNullOrEmpty(val) ? default : JsonConvert.DeserializeObject<T>(val, JsonSetting);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 throw new ArgumentNullException(nameof(key));
 
             var val = await CSRedisCore.GetAsync(key);
-            return string.IsNullOrEmpty(val) ? null : JsonConvert.DeserializeObject<T>(val, JsonSetting);
+            return string.IsNullOrEmpty(val) ? default : JsonConvert.DeserializeObject<T>(val, JsonSetting);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             foreach (var item in cache)
             {
                 if (string.IsNullOrEmpty(item))
-                    list.Add(null);
+                    list.Add(default);
                 else
                     list.Add(JsonConvert.DeserializeObject<T>(item));
             }
@@ -175,7 +175,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             foreach (var item in cache)
             {
                 if (string.IsNullOrEmpty(item))
-                    list.Add(null);
+                    list.Add(default);
                 else
                     list.Add(JsonConvert.DeserializeObject<T>(item));
             }
@@ -224,7 +224,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var list = new List<T>();
 
             foreach (var item in val)
-                list.Add(JsonConvert.DeserializeObject<T>(item, JsonSetting));
+            {
+                if (!string.IsNullOrEmpty(item))
+                    list.Add(JsonConvert.DeserializeObject<T>(item, JsonSetting));
+                else
+                    list.Add(default);
+            }
 
             return list;
         }
@@ -271,9 +276,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
             foreach (var item in val)
             {
-                var obj = JsonConvert.DeserializeObject<T>(item, JsonSetting);
-                if (obj != null)
-                    list.Add(obj);
+                if (!string.IsNullOrEmpty(item))
+                    list.Add(JsonConvert.DeserializeObject<T>(item, JsonSetting));
+                else
+                    list.Add(default);
             }
 
             return list;

@@ -77,7 +77,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         {
             var cache = CSRedisCore.HGet(key, fieId);
             if (string.IsNullOrEmpty(cache))
-                return null;
+                return default;
 
             return JsonConvert.DeserializeObject<T>(cache);
         }
@@ -101,7 +101,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         {
             var cache = await CSRedisCore.HGetAsync(key, fieId);
             if (string.IsNullOrEmpty(cache))
-                return null;
+                return default;
 
             return JsonConvert.DeserializeObject<T>(cache);
         }
@@ -147,7 +147,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
             foreach (var item in cache)
             {
-                result.Add(JsonConvert.DeserializeObject<T>(item));
+                if (!string.IsNullOrEmpty(item))
+                    result.Add(JsonConvert.DeserializeObject<T>(item));
+                else
+                    result.Add(default);
             }
 
             return result;
@@ -170,7 +173,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
             foreach (var item in cache)
             {
-                result.Add(JsonConvert.DeserializeObject<T>(item));
+                if (!string.IsNullOrEmpty(item))
+                    result.Add(JsonConvert.DeserializeObject<T>(item));
+                else
+                    result.Add(default);
             }
 
             return result;
@@ -197,7 +203,11 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var dic = new Dictionary<string, T>();
             foreach (var item in cache)
             {
-                dic.Add(item.Key, JsonConvert.DeserializeObject<T>(item.Value));
+                if (!string.IsNullOrEmpty(item.Value))
+                    dic.Add(item.Key, JsonConvert.DeserializeObject<T>(item.Value));
+                else
+                    dic.Add(item.Key, default);
+
             }
 
             return dic;
@@ -224,7 +234,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var dic = new Dictionary<string, T>();
             foreach (var item in cache)
             {
-                dic.Add(item.Key, string.IsNullOrEmpty(item.Value) ? null : JsonConvert.DeserializeObject<T>(item.Value));
+                if (!string.IsNullOrEmpty(item.Value))
+                    dic.Add(item.Key, JsonConvert.DeserializeObject<T>(item.Value));
+                else
+                    dic.Add(item.Key, default);
             }
 
             return dic;

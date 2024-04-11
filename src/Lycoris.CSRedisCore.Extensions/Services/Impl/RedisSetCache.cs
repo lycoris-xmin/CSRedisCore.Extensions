@@ -131,7 +131,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         {
             var cache = CSRedisCore.SPop(key);
             if (string.IsNullOrEmpty(cache))
-                return null;
+                return default;
 
             return JsonConvert.DeserializeObject<T>(cache, JsonSetting);
         }
@@ -150,7 +150,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         {
             var cache = await CSRedisCore.SPopAsync(key);
             if (string.IsNullOrEmpty(cache))
-                return null;
+                return default;
 
             return JsonConvert.DeserializeObject<T>(cache, JsonSetting);
         }
