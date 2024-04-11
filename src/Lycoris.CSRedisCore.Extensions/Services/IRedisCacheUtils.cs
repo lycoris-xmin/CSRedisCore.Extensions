@@ -103,6 +103,114 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         Task<T> DequeueAsync<T>(string key) where T : class;
 
         /// <summary>
+        /// 将指定值移除队列
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        void RemoveValueFromQueue(string key, string value);
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        void RemoveValueFromQueue(string key, string value, int count);
+
+        /// <summary>
+        /// 将指定值移除队列
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        void RemoveValueFromQueue<T>(string key, T value) where T : class;
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        void RemoveValueFromQueue<T>(string key, T value, int count) where T : class;
+
+        /// <summary>
+        /// 将指定值移除队列
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        Task RemoveValueFromQueueAsync(string key, string value);
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        Task RemoveValueFromQueueAsync(string key, string value, int count);
+
+        /// <summary>
+        /// 将指定值移除队列
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        Task RemoveValueFromQueueAsync<T>(string key, T value) where T : class;
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        Task RemoveValueFromQueueAsync<T>(string key, T value, int count) where T : class;
+
+        /// <summary>
+        /// 检测队列中是否存在某个元素
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        bool CheckValueExitsFromQueue(string key, string value);
+
+        /// <summary>
+        /// 检测队列中是否存在某个元素
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        bool CheckValueExitsFromQueue<T>(string key, T value) where T : class;
+
+        /// <summary>
+        /// 检测队列中是否存在某个元素
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        Task<bool> CheckValueExitsFromQueueAsync(string key, string value);
+
+        /// <summary>
+        /// 检测队列中是否存在某个元素
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        Task<bool> CheckValueExitsFromQueueAsync<T>(string key, T value) where T : class;
+
+        /// <summary>
         /// 执行 Lua 脚本
         /// </summary>
         /// <param name="script">Lua 脚本</param>

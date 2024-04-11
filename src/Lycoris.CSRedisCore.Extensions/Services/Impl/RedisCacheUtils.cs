@@ -2,6 +2,8 @@
 using Lycoris.CSRedisCore.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Drawing;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -282,6 +284,211 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public void RemoveValueFromQueue(string key, string value)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            CSRedisCore.LRem(key, 0, value);
+        }
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        public void RemoveValueFromQueue(string key, string value, int count)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            CSRedisCore.LRem(key, count, value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public void RemoveValueFromQueue<T>(string key, T value) where T : class
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (value == null)
+                return;
+
+            var _value = JsonConvert.SerializeObject(value, JsonSetting);
+
+            CSRedisCore.LRem(key, 0, _value);
+        }
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        public void RemoveValueFromQueue<T>(string key, T value, int count) where T : class
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (value == null)
+                return;
+
+            var _value = JsonConvert.SerializeObject(value, JsonSetting);
+
+            CSRedisCore.LRem(key, count, _value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async Task RemoveValueFromQueueAsync(string key, string value)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            await CSRedisCore.LRemAsync(key, 0, value);
+        }
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        public async Task RemoveValueFromQueueAsync(string key, string value, int count)
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (value == null)
+                return;
+
+            await CSRedisCore.LRemAsync(key, count, value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async Task RemoveValueFromQueueAsync<T>(string key, T value) where T : class
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (value == null)
+                return;
+
+            var _value = JsonConvert.SerializeObject(value, JsonSetting);
+
+            await CSRedisCore.LRemAsync(key, 0, _value);
+        }
+
+        /// <summary>
+        /// 如果 count 大于 0，从头部开始移除 count 个等于 value 的元素。
+        /// 如果 count 小于 0，从尾部开始移除 count 个等于 value 的元素。
+        /// 如果 count 等于 0，移除列表中所有等于 value 的元素。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="count"></param>
+        public async Task RemoveValueFromQueueAsync<T>(string key, T value, int count) where T : class
+        {
+            if (string.IsNullOrEmpty(key))
+                return;
+
+            if (value == null)
+                return;
+
+            var _value = JsonConvert.SerializeObject(value, JsonSetting);
+
+            await CSRedisCore.LRemAsync(key, count, _value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool CheckValueExitsFromQueue(string key, string value)
+        {
+            var script = CreateCheckValueExitsFromQueueLuaScript();
+            var result = RunLuaScript(script, key, value);
+            return result != null && (long)result == 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool CheckValueExitsFromQueue<T>(string key, T value) where T : class
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(T));
+
+            var _value = JsonConvert.SerializeObject(value);
+
+            var script = CreateCheckValueExitsFromQueueLuaScript();
+            var result = RunLuaScript(script, key, _value);
+            return result != null && (long)result == 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckValueExitsFromQueueAsync(string key, string value)
+        {
+            var script = CreateCheckValueExitsFromQueueLuaScript();
+            var result = await RunLuaScriptAsync(script, key, value);
+            return result != null && (long)result == 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public async Task<bool> CheckValueExitsFromQueueAsync<T>(string key, T value) where T : class
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(T));
+
+            var _value = JsonConvert.SerializeObject(value);
+
+            var script = CreateCheckValueExitsFromQueueLuaScript();
+            var result = await RunLuaScriptAsync(script, key, _value);
+            return result != null && (long)result == 1;
+        }
+
+        /// <summary>
         /// 执行 Lua 脚本
         /// </summary>
         /// <param name="script">Lua 脚本</param>
@@ -316,5 +523,27 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// 杀死所有分区节点中，当前正在运行的 Lua 脚本
         /// </summary>
         public async Task KillLuaScriptAsync() => await CSRedisCore.ScriptKillAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private string CreateCheckValueExitsFromQueueLuaScript()
+        {
+            return @"
+                local key = KEYS[1]  
+                local value = ARGV[1]  
+                local found = 0
+                  
+                for i, v in ipairs(redis.call('LRANGE', key, 0, -1)) do  
+                    if v == value then  
+                        found = 1  
+                        break  
+                    end  
+                end  
+                  
+                return found
+            ";
+        }
     }
 }
