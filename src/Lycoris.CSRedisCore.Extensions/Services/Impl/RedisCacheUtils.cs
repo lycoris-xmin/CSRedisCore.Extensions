@@ -89,7 +89,9 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             try
             {
                 var startTime = DateTime.Now;
+
                 CSRedisClientLock client = null;
+
                 while (DateTime.Now.Subtract(startTime).TotalSeconds < getTimeout)
                 {
                     var value = Guid.NewGuid().ToString();
@@ -99,8 +101,9 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                         break;
                     }
 
-                    Thread.CurrentThread.Join(100);
+                    Task.Delay(200).RunSynchronously();
                 }
+
                 return new RedisLock(client);
             }
             catch (Exception ex)
@@ -135,7 +138,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                         break;
                     }
 
-                    Thread.CurrentThread.Join(100);
+                    await Task.Delay(200);
                 }
                 return new RedisLock(client);
             }
