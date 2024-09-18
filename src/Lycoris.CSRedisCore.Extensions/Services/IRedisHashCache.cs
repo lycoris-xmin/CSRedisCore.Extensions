@@ -179,25 +179,43 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="value"></param>
         Task<bool> SetAsync<T>(string key, params (string, T)[] value) where T : class;
 
-        /// <summary>
-        /// 将哈希表 key 中的字段 field 的值设为 value 。
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="fieId"></param>
-        /// <param name="value"></param>
-        /// <returns>如果字段是哈希表中的一个新建字段,并且值设置成功,返回true。如果哈希表中域字段已经存在且旧值已被新值覆盖,返回false。</returns>
-        bool Set<T>(string key, string fieId, T value) where T : class;
+		/// <summary>
+		/// 将哈希表 key 中的字段 field 的值设为 value 。
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="fieId"></param>
+		/// <param name="value"></param>
+		/// <returns>如果字段是哈希表中的一个新建字段,并且值设置成功,返回true。如果哈希表中域字段已经存在且旧值已被新值覆盖,返回false。</returns>
+		bool Set(string key, string fieId, string value);
 
-        /// <summary>
-        /// 将哈希表 key 中的字段 field 的值设为 value 。
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="fieId"></param>
-        /// <param name="value"></param>
-        /// <returns>如果字段是哈希表中的一个新建字段,并且值设置成功,返回true。如果哈希表中域字段已经存在且旧值已被新值覆盖,返回false。</returns>
-        Task<bool> SetAsync<T>(string key, string fieId, T value) where T : class;
+		/// <summary>
+		/// 将哈希表 key 中的字段 field 的值设为 value 。
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="key"></param>
+		/// <param name="fieId"></param>
+		/// <param name="value"></param>
+		/// <returns>如果字段是哈希表中的一个新建字段,并且值设置成功,返回true。如果哈希表中域字段已经存在且旧值已被新值覆盖,返回false。</returns>
+		bool Set<T>(string key, string fieId, T value) where T : class;
+
+		/// <summary>
+		/// 将哈希表 key 中的字段 field 的值设为 value 。
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="fieId"></param>
+		/// <param name="value"></param>
+		/// <returns>如果字段是哈希表中的一个新建字段,并且值设置成功,返回true。如果哈希表中域字段已经存在且旧值已被新值覆盖,返回false。</returns>
+		Task<bool> SetAsync(string key, string fieId, string value);
+
+		/// <summary>
+		/// 将哈希表 key 中的字段 field 的值设为 value 。
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="key"></param>
+		/// <param name="fieId"></param>
+		/// <param name="value"></param>
+		/// <returns>如果字段是哈希表中的一个新建字段,并且值设置成功,返回true。如果哈希表中域字段已经存在且旧值已被新值覆盖,返回false。</returns>
+		Task<bool> SetAsync<T>(string key, string fieId, T value) where T : class;
 
         /// <summary>
         /// 只有在字段 field 不存在时,设置哈希表字段的值
