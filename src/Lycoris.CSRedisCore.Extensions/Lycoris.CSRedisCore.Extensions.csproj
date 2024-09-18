@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Lycoris.CSRedisCore.Extensions</Title>
-    <Version>6.1.5</Version>
+    <Version>6.1.6-rc</Version>
     <Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
     <PackageIcon>lycoris-nuget-logo.png</PackageIcon>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
