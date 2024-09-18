@@ -334,7 +334,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         public T[] Max<T>(string key, long count = 1) where T : class
         {
             var cache = CSRedisCore.ZPopMax(key, count);
-            return cache?.Select(x => JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
+            return cache?.Select(x => string.IsNullOrEmpty(x.member) ? default : JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
         }
 
         /// <summary>
@@ -360,7 +360,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         public async Task<T[]> MaxAsync<T>(string key, long count = 1)
         {
             var cache = await CSRedisCore.ZPopMaxAsync(key, count);
-            return cache?.Select(x => JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
+            return cache?.Select(x => string.IsNullOrEmpty(x.member) ? default : JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         public T[] Min<T>(string key, long count = 1) where T : class
         {
             var cache = CSRedisCore.ZPopMin(key, count);
-            return cache?.Select(x => JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
+            return cache?.Select(x => string.IsNullOrEmpty(x.member) ? default : JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
         }
 
         /// <summary>
@@ -412,7 +412,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         public async Task<T[]> MinAsync<T>(string key, long count = 1) where T : class
         {
             var cache = await CSRedisCore.ZPopMinAsync(key, count);
-            return cache?.Select(x => JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
+            return cache?.Select(x => string.IsNullOrEmpty(x.member) ? default : JsonConvert.DeserializeObject<T>(x.member, JsonSetting)).ToArray();
         }
 
         /// <summary>

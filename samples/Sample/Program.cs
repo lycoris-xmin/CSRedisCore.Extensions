@@ -15,13 +15,13 @@ var summaries = new[]
 
 CSRedisCoreBuilder.AddSingleRedisInstance(opt =>
 {
-    opt.Host = "your redis host";
+    opt.Host = "127.0.0.1";
     opt.Port = 6379;
 
     // redis6.0以上设置了用户名密码的情况下需要填写，其他情况不需要填写
     //opt.UserName = "your redis username";
 
-    opt.Password = "your redis password";
+    opt.Password = "";
     opt.SSL = false;
     // 不设置的情况下默认为 0 库
     //opt.UseDatabase = 1;
@@ -31,7 +31,17 @@ CSRedisCoreBuilder.AddSingleRedisInstance(opt =>
 
 app.MapGet("/weatherforecast", async () =>
 {
-    await RedisCache.String.SetAsync("testdemo", Guid.NewGuid().ToString(), TimeSpan.FromSeconds(60));
+    for (int i = 0; i < 5; i++)
+    {
+        await RedisCache.Utils.EnqueueAsync("test_demo", i.ToString());
+    }
+
+    await RedisCache.Utils.RemoveValueFromQueueAsync("test_demo", 4.ToString());
+
+    var result5 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", 5.ToString());
+
+    var result3 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", 3.ToString());
+
     var cache = await RedisCache.String.GetAsync("testdemo");
     Console.WriteLine(cache);
 
@@ -51,4 +61,9 @@ app.Run();
 internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+internal class TestDemo
+{
+    public string A { get; set; } = "";
 }

@@ -62,6 +62,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             var str = CSRedisCore.LPop(key);
+
+            if (string.IsNullOrEmpty(str))
+                return default;
+
             return JsonConvert.DeserializeObject<T>(str);
         }
 
@@ -77,6 +81,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             var str = await CSRedisCore.LPopAsync(key);
+
+            if (string.IsNullOrEmpty(str))
+                return default;
+
             return JsonConvert.DeserializeObject<T>(str);
         }
 
@@ -118,6 +126,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             var str = CSRedisCore.RPop(key);
+
+            if (string.IsNullOrEmpty(str))
+                return default;
+
             return JsonConvert.DeserializeObject<T>(str);
         }
 
@@ -133,6 +145,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             var str = await CSRedisCore.RPopAsync(key);
+
+            if (string.IsNullOrEmpty(str))
+                return default;
+
             return JsonConvert.DeserializeObject<T>(str);
         }
 
