@@ -140,7 +140,7 @@ namespace Lycoris.CSRedisCore.Extensions.Options
             sb.AppendFormat("autoDispose={0}", AutoDispose);
             sb.AppendFormat("ssl={0},", SSL);
             sb.AppendFormat("testcluster={0},", TestCluster);
-            sb.AppendFormat("tryit={0}", RetryOnFailure);
+            sb.AppendFormat("tryit={0},", RetryOnFailure);
 
             if (!string.IsNullOrEmpty(Prefix))
                 sb.AppendFormat("prefix={0},", Prefix);
