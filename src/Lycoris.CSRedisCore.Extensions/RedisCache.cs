@@ -17,6 +17,11 @@ namespace Lycoris.CSRedisCore.Extensions
         internal static CSRedisClient Client;
 
         /// <summary>
+        /// 
+        /// </summary>
+        internal static string PrefixCacheKey = "";
+
+        /// <summary>
         /// Json序列化配置
         /// </summary>
         internal static JsonSerializerSettings JsonSetting { get; set; } = new JsonSerializerSettings()
@@ -41,7 +46,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Key != null)
                     return _Key;
 
-                _Key = new RedisKeyCache(Client);
+                _Key = new RedisKeyCache(Client, PrefixCacheKey);
 
                 return _Key;
             }

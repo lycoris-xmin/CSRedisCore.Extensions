@@ -143,7 +143,7 @@ namespace Lycoris.CSRedisCore.Extensions.Options
             sb.AppendFormat("tryit={0},", RetryOnFailure);
 
             if (!string.IsNullOrEmpty(Prefix))
-                sb.AppendFormat("prefix={0},", Prefix);
+                sb.AppendFormat("prefix={0}:,", Prefix);
 
             sb.AppendFormat("preheat={0}", Preheat > 0 ? Preheat.ToString() : "false");
 

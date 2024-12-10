@@ -23,7 +23,12 @@ namespace Lycoris.CSRedisCore.Extensions
         /// <summary>
         /// 
         /// </summary>
-        internal static Dictionary<string, RedisCacheService> Instances;
+        internal static Dictionary<string, string> PrefixCackeKeys = new Dictionary<string, string>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal static Dictionary<string, RedisCacheService> Instances = new Dictionary<string, RedisCacheService>();
 
         /// <summary>
         /// 
@@ -41,7 +46,7 @@ namespace Lycoris.CSRedisCore.Extensions
 
             if (!Instances.ContainsKey(name))
             {
-                Instances.Add(name, new RedisCacheService(Clients[name], RedisJsonSerializerSettings[name]));
+                Instances.Add(name, new RedisCacheService(Clients[name], RedisJsonSerializerSettings[name], PrefixCackeKeys[name]));
             }
 
             return Instances[name];

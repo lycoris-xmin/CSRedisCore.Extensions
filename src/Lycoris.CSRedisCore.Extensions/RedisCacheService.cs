@@ -24,20 +24,27 @@ namespace Lycoris.CSRedisCore.Extensions
         private readonly JsonSerializerSettings JsonSetting;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private string PrefixCacheKey = "";
+
+        /// <summary>
         /// ctor
         /// </summary>
         /// <param name="Command"></param>
         /// <param name="JsonSerializerSetting"></param>
-        public RedisCacheService(CSRedisClient Command, JsonSerializerSettings JsonSerializerSetting)
+        public RedisCacheService(CSRedisClient Command, JsonSerializerSettings JsonSerializerSetting, string prefixCackeKey)
         {
             this.Command = Command;
             JsonSetting = JsonSerializerSetting ?? new JsonSerializerSettings()
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 DateFormatString = "yyyy-MM-dd HH:mm:ss.ffffff",
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                NullValueHandling = NullValueHandling.Ignore,
+                MaxDepth = 200
             };
+            PrefixCacheKey = $"{prefixCackeKey}:";
         }
 
         private IRedisKeyCache _Key = null;
@@ -51,7 +58,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Key != null)
                     return _Key;
 
-                _Key = new RedisKeyCache(Command);
+                _Key = new RedisKeyCache(Command, this.PrefixCacheKey);
                 return _Key;
             }
         }

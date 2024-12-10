@@ -20,6 +20,7 @@ namespace Lycoris.CSRedisCore.Extensions
             var configuretaion = new RedisConiguration();
             configure(configuretaion);
             RedisCache.Client = configuretaion.HasSentinels ? new CSRedisClient(configuretaion.ToString(), configuretaion.Sentinels) : new CSRedisClient(configuretaion.ToString());
+            RedisCache.PrefixCacheKey = configuretaion.Prefix;
         }
 
         /// <summary>
@@ -36,6 +37,8 @@ namespace Lycoris.CSRedisCore.Extensions
                 RedisCacheFactory.Clients = new Dictionary<string, CSRedisClient>();
 
             RedisCacheFactory.Clients.Add(instanceName, configuretaion.HasSentinels ? new CSRedisClient(configuretaion.ToString(), configuretaion.Sentinels) : new CSRedisClient(configuretaion.ToString()));
+
+            RedisCacheFactory.PrefixCackeKeys.Add(instanceName, configuretaion.Prefix);
 
             if (RedisCacheFactory.RedisJsonSerializerSettings == null)
                 RedisCacheFactory.RedisJsonSerializerSettings = new Dictionary<string, JsonSerializerSettings>();

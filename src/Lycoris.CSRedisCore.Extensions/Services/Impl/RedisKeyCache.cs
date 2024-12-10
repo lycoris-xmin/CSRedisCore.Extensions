@@ -10,14 +10,17 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
     public class RedisKeyCache : IRedisKeyCache
     {
         private readonly CSRedisClient CSRedisCore;
+        private readonly string PrefixCacheKey;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="CSRedisCore"></param>
-        public RedisKeyCache(CSRedisClient CSRedisCore)
+        /// <param name="PrefixCacheKey"></param>
+        public RedisKeyCache(CSRedisClient CSRedisCore, string PrefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
+            this.PrefixCacheKey = string.IsNullOrEmpty(PrefixCacheKey) ? "" : $"{PrefixCacheKey}:";
         }
 
         /// <summary>
@@ -25,14 +28,46 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// </summary>
         /// <param name="pattern"></param>
         /// <returns></returns>
-        public string[] GetKeys(string pattern) => CSRedisCore.Keys(pattern.EndsWith("*") ? pattern : $"{pattern}*");
+        public string[] GetKeys(string pattern)
+        {
+            var keys = CSRedisCore.Keys($"{this.PrefixCacheKey}{(pattern.EndsWith("*") ? pattern : $"{pattern}*")}");
+            if (keys == null || keys.Length == 0)
+                return Array.Empty<string>();
+
+            // 移除每个键的前缀部分
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i].StartsWith(this.PrefixCacheKey))
+                {
+                    keys[i] = keys[i].Substring(this.PrefixCacheKey.Length);
+                }
+            }
+
+            return keys;
+        }
 
         /// <summary>
         /// 模糊查找所有键
         /// </summary>
         /// <param name="pattern"></param>
         /// <returns></returns>
-        public async Task<string[]> GetKeysAsync(string pattern) => await CSRedisCore.KeysAsync(pattern.EndsWith("*") ? pattern : $"{pattern}*");
+        public async Task<string[]> GetKeysAsync(string pattern)
+        {
+            var keys = await CSRedisCore.KeysAsync($"{this.PrefixCacheKey}{(pattern.EndsWith("*") ? pattern : $"{pattern}*")}");
+            if (keys == null || keys.Length == 0)
+                return Array.Empty<string>();
+
+            // 移除每个键的前缀部分
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i].StartsWith(this.PrefixCacheKey))
+                {
+                    keys[i] = keys[i].Substring(this.PrefixCacheKey.Length);
+                }
+            }
+
+            return keys;
+        }
 
         /// <summary>
         /// 检查给定 key 是否存在
