@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services
 {
@@ -130,5 +131,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="value"></param>
         /// <returns></returns>
         Task SetLastAsync<T>(string key, params T[] value) where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        Task<List<string>> GetAllAsync(string key);
     }
 }

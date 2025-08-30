@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services
 {
@@ -90,5 +91,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// </summary>
         /// <param name="key"></param>
         Task<T> GetRandomAsync<T>(string key) where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="setKey"></param>
+        /// <returns></returns>
+        Task<List<string>> GetAllAsync(string setKey);
     }
 }

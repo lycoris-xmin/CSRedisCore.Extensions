@@ -188,6 +188,23 @@ namespace Lycoris.CSRedisCore.Extensions
             }
         }
 
+
+        private static IMonitorService _Monitor = null;
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IMonitorService Monitor
+        {
+            get
+            {
+                if (_Monitor != null)
+                    return _Monitor;
+
+                _Monitor = new MonitorService(Client, JsonSetting);
+                return _Monitor;
+            }
+        }
+
         /// <summary>
         /// CSRedis 原本的Client
         /// </summary>

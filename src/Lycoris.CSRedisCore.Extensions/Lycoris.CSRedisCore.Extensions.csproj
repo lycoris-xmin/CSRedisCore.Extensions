@@ -1,32 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Lycoris.CSRedisCore.Extensions</Title>
-		<Version>6.2.0-rc</Version>
+		<Version>6.1.6-rc</Version>
 		<Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
-		<PackageIcon>lycoris-nuget-logo.png</PackageIcon>
-		<PackageReadmeFile>Readme.md</PackageReadmeFile>
+		<PackageIcon>
+		</PackageIcon>
+		<PackageReadmeFile>
+		</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/lycoris-xmin/CSRedisCore.Extensions</RepositoryUrl>
 		<Authors>Lycoris</Authors>
 	</PropertyGroup>
-
 	<ItemGroup>
-		<None Include="..\..\lycoris-nuget-logo.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-		<None Include="..\..\Readme.md">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
+		<PackageReference Include="CSRedisCore" Version="3.8.806" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="CSRedisCore" Version="3.8.670" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-	</ItemGroup>
-
 </Project>

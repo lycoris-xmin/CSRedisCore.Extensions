@@ -1,6 +1,7 @@
 ﻿using CSRedis;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
@@ -314,6 +315,18 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             }
 
             await CSRedisCore.RPushAsync(key, list.ToArray());
+        }
+
+        /// <summary>
+        /// 获取列表的所有元素
+        /// </summary>
+        /// <param name="key">列表的 Redis 键</param>
+        /// <returns>列表中的所有元素</returns>
+        public async Task<List<string>> GetAllAsync(string key)
+        {
+            // 使用 LRANGE 获取列表所有元素，从索引 0 到 -1
+            var items = await CSRedisCore.LRangeAsync(key, 0, -1);
+            return items.ToList();
         }
     }
 }

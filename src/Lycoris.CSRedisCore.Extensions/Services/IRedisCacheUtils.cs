@@ -1,4 +1,6 @@
-﻿using Lycoris.CSRedisCore.Extensions.Options;
+﻿using CSRedis;
+using Lycoris.CSRedisCore.Extensions.Options;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services
@@ -225,5 +227,41 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="key">用于定位分区节点，不含prefix前辍</param>
         /// <param name="args">参数</param>
         Task<object> RunLuaScriptAsync(string script, string key, params object[] args);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void FlushLuaScriptCache();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task FlushLuaScriptCacheAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void KillLuaScript();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task KillLuaScriptAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        List<(string node, string value)> RedisInfo(InfoSection? section = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        Task<List<(string node, string value)>> RedisInfoAsync(InfoSection? section = null);
     }
 }

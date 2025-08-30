@@ -449,7 +449,14 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="value"></param>
         /// <param name="timeSpan">过期时间</param>
         /// <returns></returns>
-        public long Addition(string key, string fieId, long value = 1, TimeSpan? timeSpan = null) => CSRedisCore.HIncrBy(key, fieId, value);
+        public long Addition(string key, string fieId, long value = 1, TimeSpan? timeSpan = null)
+        {
+            value = CSRedisCore.HIncrBy(key, fieId, value);
+            if (timeSpan != null)
+                CSRedisCore.Expire(key, (int)Math.Ceiling(timeSpan.Value.TotalSeconds));
+
+            return value;
+        }
 
         /// <summary>
         /// 为哈希表 key 中的指定字段的整数值加上增量
@@ -459,6 +466,14 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="value"></param>
         /// <param name="timeSpan">过期时间</param>
         /// <returns></returns>
-        public async Task<long> AdditionAsync(string key, string fieId, long value = 1, TimeSpan? timeSpan = null) => await CSRedisCore.HIncrByAsync(key, fieId, value);
+        public async Task<long> AdditionAsync(string key, string fieId, long value = 1, TimeSpan? timeSpan = null)
+        {
+            value = await CSRedisCore.HIncrByAsync(key, fieId, value);
+
+            if (timeSpan != null)
+                await CSRedisCore.ExpireAsync(key, (int)Math.Ceiling(timeSpan.Value.TotalSeconds));
+
+            return value;
+        }
     }
 }

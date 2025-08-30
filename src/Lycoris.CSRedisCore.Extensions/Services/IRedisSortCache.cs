@@ -309,5 +309,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="member"></param>
         /// <returns></returns>
         Task<decimal?> GetScoreAsync(string key, string member);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, decimal>> GetAllAsync(string key);
     }
 }

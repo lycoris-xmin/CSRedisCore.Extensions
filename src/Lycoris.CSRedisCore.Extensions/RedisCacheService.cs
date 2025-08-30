@@ -29,10 +29,11 @@ namespace Lycoris.CSRedisCore.Extensions
         private string PrefixCacheKey = "";
 
         /// <summary>
-        /// ctor
+        /// 
         /// </summary>
         /// <param name="Command"></param>
         /// <param name="JsonSerializerSetting"></param>
+        /// <param name="prefixCackeKey"></param>
         public RedisCacheService(CSRedisClient Command, JsonSerializerSettings JsonSerializerSetting, string prefixCackeKey)
         {
             this.Command = Command;
@@ -196,6 +197,22 @@ namespace Lycoris.CSRedisCore.Extensions
 
                 _Utils = new RedisCacheUtils(Command, JsonSetting);
                 return _Utils;
+            }
+        }
+
+        private IMonitorService _Monitor = null;
+        /// <summary>
+        /// 
+        /// </summary>
+        public IMonitorService Monitor
+        {
+            get
+            {
+                if (_Monitor != null)
+                    return _Monitor;
+
+                _Monitor = new MonitorService(Command, JsonSetting);
+                return _Monitor;
             }
         }
 

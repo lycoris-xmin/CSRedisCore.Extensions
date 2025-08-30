@@ -2,6 +2,8 @@
 using Lycoris.CSRedisCore.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
@@ -523,6 +525,28 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// 杀死所有分区节点中，当前正在运行的 Lua 脚本
         /// </summary>
         public async Task KillLuaScriptAsync() => await CSRedisCore.ScriptKillAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        public List<(string node, string value)> RedisInfo(InfoSection? section = null)
+        {
+            var result = CSRedisCore.NodesServerManager.Info(section);
+            return result.ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        public async Task<List<(string node, string value)>> RedisInfoAsync(InfoSection? section = null)
+        {
+            var result = await CSRedisCore.NodesServerManager.InfoAsync(section);
+            return result.ToList();
+        }
 
         /// <summary>
         /// 

@@ -168,6 +168,25 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         Task<bool> SetAsync<T>(string key, T value, TimeSpan? expire = null) where T : class;
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expire"></param>
+        /// <returns></returns>
+        Task<bool> SetIfNotExistsAsync(string key, string value, TimeSpan? expire = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expire"></param>
+        /// <returns></returns>
+        Task<bool> SetIfNotExistsAsync<T>(string key, T value, TimeSpan? expire = null) where T : class;
+
+        /// <summary>
         /// 同时设置一个或多个 key-value 对
         /// </summary>
         /// <param name="keyValues"></param>

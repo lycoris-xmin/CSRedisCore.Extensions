@@ -438,6 +438,50 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
+        /// 设置指定 key 的值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expire"></param>
+        /// <returns></returns>
+        public async Task<bool> SetIfNotExistsAsync(string key, string value, TimeSpan? expire = null)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var result = await CSRedisCore.SetNxAsync(key, value);
+            if (result && expire != null)
+                await CSRedisCore.ExpireAsync(key, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
+
+            return result;
+        }
+
+        /// <summary>
+        /// 设置指定 key 的值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expire"></param>
+        /// <returns></returns>
+        public async Task<bool> SetIfNotExistsAsync<T>(string key, T value, TimeSpan? expire = null) where T : class
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var result = await CSRedisCore.SetNxAsync(key, JsonConvert.SerializeObject(value, JsonSetting));
+            if (result && expire != null)
+                await CSRedisCore.ExpireAsync(key, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
+
+            return result;
+        }
+
+        /// <summary>
         /// 同时设置一个或多个 key-value 对
         /// </summary>
         /// <param name="keyValues"></param>

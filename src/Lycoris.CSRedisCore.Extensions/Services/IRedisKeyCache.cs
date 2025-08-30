@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services
@@ -124,5 +125,11 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="key"></param>
         /// <returns></returns>
         Task<bool> RemoveAsync(params string[] key);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<List<RedisKeyInfo>> GetAllRedisKeysInfoAsync();
     }
 }

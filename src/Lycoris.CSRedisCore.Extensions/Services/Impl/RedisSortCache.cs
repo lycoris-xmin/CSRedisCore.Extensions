@@ -446,5 +446,19 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="member"></param>
         /// <returns></returns>
         public Task<decimal?> GetScoreAsync(string key, string member) => CSRedisCore.ZScoreAsync(key, member);
+
+        /// <summary>
+        /// 获取有序集合中的所有元素
+        /// </summary>
+        /// <param name="key">有序集合的 Redis 键</param>
+        /// <returns>有序集合中的所有元素（包含成员和值）</returns>
+        public async Task<Dictionary<string, decimal>> GetAllAsync(string key)
+        {
+            // 使用 ZRangeWithScores 获取有序集合的所有成员及其分数
+            var items = await CSRedisCore.ZRangeWithScoresAsync(key, 0, -1);
+
+            // items 是一个元组 (member, score)
+            return items.ToDictionary(x => x.member, x => x.score);
+        }
     }
 }

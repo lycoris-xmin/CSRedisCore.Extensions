@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
@@ -153,6 +154,18 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return default;
 
             return JsonConvert.DeserializeObject<T>(cache, JsonSetting);
+        }
+
+        /// <summary>
+        /// 获取集合的所有元素（用于展示）
+        /// </summary>
+        /// <param name="setKey">集合的 Redis 键</param>
+        /// <returns>集合中的所有元素</returns>
+        public async Task<List<string>> GetAllAsync(string setKey)
+        {
+            // 使用 SMEMBERS 获取集合所有元素
+            var items = await CSRedisCore.SMembersAsync(setKey);
+            return items.ToList();
         }
     }
 }
