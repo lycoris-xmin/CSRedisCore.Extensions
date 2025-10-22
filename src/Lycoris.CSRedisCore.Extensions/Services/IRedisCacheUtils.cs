@@ -105,6 +105,13 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         Task<T> DequeueAsync<T>(string key) where T : class;
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        Task<long> QueueCountAsync(string key);
+
+        /// <summary>
         /// 将指定值移除队列
         /// </summary>
         /// <param name="key"></param>

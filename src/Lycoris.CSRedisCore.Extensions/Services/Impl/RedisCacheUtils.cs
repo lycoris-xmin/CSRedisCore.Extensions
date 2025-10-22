@@ -289,6 +289,19 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// 
         /// </summary>
         /// <param name="key"></param>
+        /// <returns></returns>
+        public async Task<long> QueueCountAsync(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return 0;
+
+            return await CSRedisCore.LLenAsync(key);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
         public void RemoveValueFromQueue(string key, string value)
