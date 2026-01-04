@@ -577,16 +577,17 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            var pipe = CSRedisCore.StartPipe();
-
-            try
+            using (var pipe = CSRedisCore.StartPipe())
             {
-                action.Invoke(pipe);
-                return pipe.EndPipe();
-            }
-            catch
-            {
-                throw;
+                try
+                {
+                    action.Invoke(pipe);
+                    return pipe.EndPipe();
+                }
+                catch
+                {
+                    throw;
+                }
             }
         }
 
@@ -600,16 +601,17 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (func == null)
                 throw new ArgumentNullException(nameof(func));
 
-            var pipe = CSRedisCore.StartPipe();
-
-            try
+            using (var pipe = CSRedisCore.StartPipe())
             {
-                await func.Invoke(pipe);
-                return pipe.EndPipe();
-            }
-            catch
-            {
-                throw;
+                try
+                {
+                    await func.Invoke(pipe);
+                    return pipe.EndPipe();
+                }
+                catch
+                {
+                    throw;
+                }
             }
         }
 
