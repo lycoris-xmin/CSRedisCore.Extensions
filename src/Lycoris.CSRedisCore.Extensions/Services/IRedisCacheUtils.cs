@@ -1,5 +1,6 @@
 ﻿using CSRedis;
 using Lycoris.CSRedisCore.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -270,5 +271,25 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="section"></param>
         /// <returns></returns>
         Task<List<(string node, string value)>> RedisInfoAsync(InfoSection? section = null);
+
+        /// <summary>
+        /// 获取 Redis 事务 管道流
+        /// </summary>
+        /// <returns></returns>
+        CSRedisClientPipe<string> GetTransaction();
+
+        /// <summary>
+        /// Redis 事务
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        object[] PipeExecute(Action<CSRedisClientPipe<string>> action);
+
+        /// <summary>
+        /// 异步事务执行，接收异步操作委托
+        /// </summary>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        Task<object[]> PipeExecuteAsync(Func<CSRedisClientPipe<string>, Task> func);
     }
 }

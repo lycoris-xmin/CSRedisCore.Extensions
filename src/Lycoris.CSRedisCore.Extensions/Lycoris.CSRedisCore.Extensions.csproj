@@ -3,7 +3,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Title>Lycoris.CSRedisCore.Extensions</Title>
-		<Version>8.0.1</Version>
+		<Version>8.0.2</Version>
 		<Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
 		<PackageIcon>
 		</PackageIcon>

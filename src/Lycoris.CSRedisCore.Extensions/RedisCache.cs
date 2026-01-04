@@ -155,23 +155,6 @@ namespace Lycoris.CSRedisCore.Extensions
         }
 
 
-        private static IRedisTransaction _Transaction = null;
-        /// <summary>
-        /// 事务管道
-        /// </summary>
-        public static IRedisTransaction Transaction
-        {
-            get
-            {
-                if (_Transaction != null)
-                    return _Transaction;
-
-                _Transaction = new RedisTransaction(Client, JsonSetting);
-                return _Transaction;
-            }
-        }
-
-
         private static IRedisCacheUtils _Utils = null;
         /// <summary>
         /// 封装工具
