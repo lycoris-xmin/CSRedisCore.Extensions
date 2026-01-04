@@ -1,5 +1,6 @@
 ﻿using CSRedis;
 using System;
+using System.Threading.Tasks;
 
 namespace Lycoris.CSRedisCore.Extensions.Services
 {
@@ -17,8 +18,15 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <summary>
         /// Redis 事务
         /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        object[] Execute(Action<CSRedisClientPipe<string>> action);
+
+        /// <summary>
+        /// 异步事务执行，接收异步操作委托
+        /// </summary>
         /// <param name="func"></param>
         /// <returns></returns>
-        object[] Shell(Action<CSRedisClientPipe<string>> func);
+        Task<object[]> ExecuteAsync(Func<CSRedisClientPipe<string>, Task> func);
     }
 }
