@@ -220,22 +220,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return (long)result == 1;
         }
 
-
         /// <summary>
         /// Redis队列入队列
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="checkDuplicate"></param>
-        public void Enqueue<T>(string key, T value, bool checkDuplicate = true) where T : class
+        public bool Enqueue<T>(string key, T value, bool checkDuplicate = true) where T : class
         {
             if (string.IsNullOrEmpty(key))
-                return;
+                return false;
 
             if (value == null)
-                return;
+                return false;
 
-            this.Enqueue(key, JsonConvert.SerializeObject(value, JsonSetting), checkDuplicate);
+            return this.Enqueue(key, JsonConvert.SerializeObject(value, JsonSetting), checkDuplicate);
         }
 
         /// <summary>
@@ -244,18 +243,15 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="checkDuplicate"></param>
-        public async Task EnqueueAsync<T>(string key, T value, bool checkDuplicate) where T : class
+        public async Task<bool> EnqueueAsync<T>(string key, T value, bool checkDuplicate = true) where T : class
         {
             if (string.IsNullOrEmpty(key))
-                return;
-
-            if (string.IsNullOrEmpty(key))
-                return;
+                return false;
 
             if (value == null)
-                return;
+                return false;
 
-            await this.EnqueueAsync(key, JsonConvert.SerializeObject(value, JsonSetting), checkDuplicate);
+            return await this.EnqueueAsync(key, JsonConvert.SerializeObject(value, JsonSetting), checkDuplicate);
         }
 
         /// <summary>
