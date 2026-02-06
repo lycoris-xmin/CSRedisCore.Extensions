@@ -14,7 +14,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="CSRedisCore" Version="3.8.806" />
+		<PackageReference Include="CSRedisCore" Version="3.8.807" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
 	</ItemGroup>

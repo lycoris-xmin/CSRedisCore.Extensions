@@ -54,28 +54,32 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        void Enqueue(string key, string value);
+        /// <param name="checkDuplicate"></param>
+        bool Enqueue(string key, string value, bool checkDuplicate = true);
 
         /// <summary>
         /// Redis队列入队列
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        Task EnqueueAsync(string key, string value);
+        /// <param name="checkDuplicate"></param>
+        Task<bool> EnqueueAsync(string key, string value, bool checkDuplicate = true);
 
         /// <summary>
         /// Redis队列入队列
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        void Enqueue<T>(string key, T value) where T : class;
+        /// <param name="checkDuplicate"></param>
+        bool Enqueue<T>(string key, T value, bool checkDuplicate = true) where T : class;
 
         /// <summary>
         /// Redis队列入队列
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        Task EnqueueAsync<T>(string key, T value) where T : class;
+        /// <param name="checkDuplicate"></param>
+        Task<bool> EnqueueAsync<T>(string key, T value, bool checkDuplicate = true) where T : class;
 
         /// <summary>
         /// Redis队列出队列
