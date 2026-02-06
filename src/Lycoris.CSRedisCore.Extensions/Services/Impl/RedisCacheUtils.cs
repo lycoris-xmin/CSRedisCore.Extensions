@@ -175,15 +175,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              -- 判断值是否已存在Set中
-                              if redis.call('SISMEMBER', ARGV[2], ARGV[1]) == 1 then
-                                  return 0
-                              else
-                                  -- 不存在则入队列并添加到Set中
-                                  redis.call('RPUSH', KEYS[1], ARGV[1])
-                                  redis.call('SADD', ARGV[2], ARGV[1])
-                                  return 1
-                              end
+                            local queueKey = KEYS[1]
+                            local countHashKey = ARGV[2]
+                            local val = ARGV[1]
+                            local checkDuplicate = tonumber(ARGV[3])
+                            
+                            if checkDuplicate == 1 then
+                                local count = tonumber(redis.call('HGET', countHashKey, val) or ""0"")
+                                if count > 0 then
+                                    return 0 -- 重复且不入队
+                                end
+                            end
+                            
+                            redis.call('RPUSH', queueKey, val)
+                            redis.call('HINCRBY', countHashKey, val, 1)
+                            return 1
                           ";
 
             // KEYS[1] 是主队列key，ARGV[1]是value，ARGV[2]是setKey
@@ -212,13 +218,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              if redis.call('SISMEMBER', ARGV[2], ARGV[1]) == 1 then
-                                  return 0
-                              else
-                                  redis.call('RPUSH', KEYS[1], ARGV[1])
-                                  redis.call('SADD', ARGV[2], ARGV[1])
-                                  return 1
-                              end
+                            local queueKey = KEYS[1]
+                            local countHashKey = ARGV[2]
+                            local val = ARGV[1]
+                            local checkDuplicate = tonumber(ARGV[3])
+                            
+                            if checkDuplicate == 1 then
+                                local count = tonumber(redis.call('HGET', countHashKey, val) or ""0"")
+                                if count > 0 then
+                                    return 0 -- 重复且不入队
+                                end
+                            end
+                            
+                            redis.call('RPUSH', queueKey, val)
+                            redis.call('HINCRBY', countHashKey, val, 1)
+                            return 1
                           ";
 
             var result = await CSRedisCore.EvalAsync(script, key, value, setKey);
@@ -272,15 +286,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              -- 从队列头部弹出一个元素
-                              local val = redis.call('LPOP', KEYS[1])
-                              if val ~= false then
-                                  -- 弹出成功，则从Set中移除该值
-                                  redis.call('SREM', ARGV[1], val)
-                                  return val
-                              else
-                                  return nil
-                              end
+                            local queueKey = KEYS[1]
+                            local countHashKey = ARGV[1]
+                            
+                            local val = redis.call('LPOP', queueKey)
+                            if val then
+                                local count = tonumber(redis.call('HGET', countHashKey, val) or ""0"")
+                                if count > 1 then
+                                    redis.call('HINCRBY', countHashKey, val, -1)
+                                else
+                                    redis.call('HDEL', countHashKey, val)
+                                end
+                                return val
+                            else
+                                return nil
+                            end
                           ";
 
             var result = CSRedisCore.Eval(script, key, setKey);
@@ -300,13 +320,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              local val = redis.call('LPOP', KEYS[1])
-                              if val ~= false then
-                                  redis.call('SREM', ARGV[1], val)
-                                  return val
-                              else
-                                  return nil
-                              end
+                            local queueKey = KEYS[1]
+                            local countHashKey = ARGV[1]
+                            
+                            local val = redis.call('LPOP', queueKey)
+                            if val then
+                                local count = tonumber(redis.call('HGET', countHashKey, val) or ""0"")
+                                if count > 1 then
+                                    redis.call('HINCRBY', countHashKey, val, -1)
+                                else
+                                    redis.call('HDEL', countHashKey, val)
+                                end
+                                return val
+                            else
+                                return nil
+                            end
                           ";
 
             var result = await CSRedisCore.EvalAsync(script, key, setKey);
@@ -367,11 +395,9 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              -- 移除列表中所有匹配元素
-                              redis.call('LREM', KEYS[1], 0, ARGV[1])
-                              -- 同步从辅助Set中移除该元素
-                              redis.call('SREM', ARGV[2], ARGV[1])
-                              return 1
+                            redis.call('LREM', KEYS[1], 0, ARGV[1])
+                            redis.call('HDEL', ARGV[2], ARGV[1])
+                            return 1
                           ";
 
             CSRedisCore.Eval(script, key, value, setKey);
@@ -391,9 +417,17 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              redis.call('LREM', KEYS[1], ARGV[2], ARGV[1])
-                              redis.call('SREM', ARGV[3], ARGV[1])
-                              return 1
+                            local removedCount = redis.call('LREM', KEYS[1], tonumber(ARGV[2]), ARGV[1])
+                            if removedCount > 0 then
+                                local currentCount = tonumber(redis.call('HGET', ARGV[3], ARGV[1]) or ""0"")
+                                local newCount = currentCount - removedCount
+                                if newCount > 0 then
+                                    redis.call('HSET', ARGV[3], ARGV[1], newCount)
+                                else
+                                    redis.call('HDEL', ARGV[3], ARGV[1])
+                                end
+                            end
+                            return 1
                           ";
 
             CSRedisCore.Eval(script, key, value, count, setKey);
@@ -444,9 +478,9 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              redis.call('LREM', KEYS[1], 0, ARGV[1])
-                              redis.call('SREM', ARGV[2], ARGV[1])
-                              return 1
+                            redis.call('LREM', KEYS[1], 0, ARGV[1])
+                            redis.call('HDEL', ARGV[2], ARGV[1])
+                            return 1
                           ";
 
             await CSRedisCore.EvalAsync(script, key, value, setKey);
@@ -467,9 +501,17 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                              redis.call('LREM', KEYS[1], ARGV[2], ARGV[1])
-                              redis.call('SREM', ARGV[3], ARGV[1])
-                              return 1
+                            local removedCount = redis.call('LREM', KEYS[1], tonumber(ARGV[2]), ARGV[1])
+                            if removedCount > 0 then
+                                local currentCount = tonumber(redis.call('HGET', ARGV[3], ARGV[1]) or ""0"")
+                                local newCount = currentCount - removedCount
+                                if newCount > 0 then
+                                    redis.call('HSET', ARGV[3], ARGV[1], newCount)
+                                else
+                                    redis.call('HDEL', ARGV[3], ARGV[1])
+                                end
+                            end
+                            return 1
                           ";
 
             await CSRedisCore.EvalAsync(script, key, value, count, setKey);
