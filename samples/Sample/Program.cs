@@ -34,19 +34,21 @@ app.MapGet("/weatherforecast", async () =>
 {
     for (int i = 0; i < 5; i++)
     {
-        await RedisCache.Utils.EnqueueAsync("test_demo", i.ToString());
+        await RedisCache.Utils.EnqueueAsync("test_demo", new { index = i.ToString() });
     }
 
     for (int i = 0; i < 5; i++)
     {
-        await RedisCache.Utils.EnqueueAsync("test_demo", i.ToString(), false);
+        await RedisCache.Utils.EnqueueAsync("test_demo", new { index = i.ToString() }, false);
     }
 
-    await RedisCache.Utils.RemoveValueFromQueueAsync("test_demo", 4.ToString());
+    await RedisCache.Utils.RemoveValueFromQueueAsync("test_demo", new { index = 4.ToString() });
 
-    var result5 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", 5.ToString());
+    var result5 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", new { index = 5.ToString() });
 
-    var result3 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", 3.ToString());
+    var result3 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", new { index = 3.ToString() });
+
+    var result4 = await RedisCache.Utils.DequeueAsync("test_demo");
 
     var cache = await RedisCache.String.GetAsync("testdemo");
     Console.WriteLine(cache);
