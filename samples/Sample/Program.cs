@@ -27,6 +27,7 @@ CSRedisCoreBuilder.AddSingleRedisInstance(opt =>
     //opt.UseDatabase = 1;
     // 是否尝试集群模式，阿里云、腾讯云集群需要设置此选项为 false
     opt.TestCluster = false;
+    opt.Prefix = "Lycoris:Test";
 });
 
 app.MapGet("/weatherforecast", async () =>
@@ -34,6 +35,11 @@ app.MapGet("/weatherforecast", async () =>
     for (int i = 0; i < 5; i++)
     {
         await RedisCache.Utils.EnqueueAsync("test_demo", i.ToString());
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+        await RedisCache.Utils.EnqueueAsync("test_demo", i.ToString(), false);
     }
 
     await RedisCache.Utils.RemoveValueFromQueueAsync("test_demo", 4.ToString());

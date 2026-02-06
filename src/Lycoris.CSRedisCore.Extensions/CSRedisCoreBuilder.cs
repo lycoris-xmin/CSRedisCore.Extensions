@@ -20,7 +20,7 @@ namespace Lycoris.CSRedisCore.Extensions
             var configuretaion = new RedisConiguration();
             configure(configuretaion);
             RedisCache.Client = configuretaion.HasSentinels ? new CSRedisClient(configuretaion.ToString(), configuretaion.Sentinels) : new CSRedisClient(configuretaion.ToString());
-            RedisCache.PrefixCacheKey = configuretaion.Prefix;
+            RedisCache.PrefixCacheKey = $"{configuretaion.Prefix.TrimEnd(':')}:";
         }
 
         /// <summary>

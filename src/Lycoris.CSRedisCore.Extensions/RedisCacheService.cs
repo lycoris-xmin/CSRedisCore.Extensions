@@ -45,7 +45,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 NullValueHandling = NullValueHandling.Ignore,
                 MaxDepth = 200
             };
-            PrefixCacheKey = $"{prefixCackeKey}:";
+            PrefixCacheKey = $"{prefixCackeKey.TrimEnd(':')}:";
         }
 
         private IRedisKeyCache _Key = null;
@@ -178,7 +178,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Utils != null)
                     return _Utils;
 
-                _Utils = new RedisCacheUtils(Command, JsonSetting);
+                _Utils = new RedisCacheUtils(Command, JsonSetting, PrefixCacheKey);
                 return _Utils;
             }
         }

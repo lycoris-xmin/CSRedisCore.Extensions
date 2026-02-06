@@ -166,7 +166,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Utils != null)
                     return _Utils;
 
-                _Utils = new RedisCacheUtils(Client, JsonSetting);
+                _Utils = new RedisCacheUtils(Client, JsonSetting, PrefixCacheKey);
                 return _Utils;
             }
         }

@@ -15,16 +15,18 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
     {
         private readonly CSRedisClient CSRedisCore;
         private readonly JsonSerializerSettings JsonSetting;
+        private readonly string PrefixCacheKey = "";
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="CSRedisCore"></param>
         /// <param name="JsonSetting"></param>
-        public RedisCacheUtils(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting)
+        public RedisCacheUtils(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting, string prefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
             this.JsonSetting = JsonSetting;
+            PrefixCacheKey = prefixCacheKey;
         }
 
         /// <summary>
@@ -162,32 +164,35 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
+            // 不检查重复，直接入队
             if (!checkDuplicate)
             {
                 CSRedisCore.RPush(key, value);
                 return true;
             }
 
-            // 额外的辅助 Set key，约定为原队列key后缀 ":set"
-            var setKey = key + ":set";
+            // 辅助的Set Key，用于唯一性检测
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                          if redis.call('SISMEMBER', KEYS[2], ARGV[1]) == 1 then
-                              return 0
-                          else
-                              redis.call('RPUSH', KEYS[1], ARGV[1])
-                              redis.call('SADD', KEYS[2], ARGV[1])
-                              return 1
-                          end
+                              -- 判断值是否已存在Set中
+                              if redis.call('SISMEMBER', ARGV[2], ARGV[1]) == 1 then
+                                  return 0
+                              else
+                                  -- 不存在则入队列并添加到Set中
+                                  redis.call('RPUSH', KEYS[1], ARGV[1])
+                                  redis.call('SADD', ARGV[2], ARGV[1])
+                                  return 1
+                              end
                           ";
 
-            var result = CSRedisCore.Eval(script, key, setKey, value);
-
+            // KEYS[1] 是主队列key，ARGV[1]是value，ARGV[2]是setKey
+            var result = CSRedisCore.Eval(script, key, value, setKey);
             return (long)result == 1;
         }
 
         /// <summary>
-        /// Redis队列入队列，异步版本，支持去重（长队列场景，基于辅助Set实现）
+        /// Redis队列入队列异步版本，支持去重（长队列场景，基于辅助Set实现）
         /// </summary>
         /// <param name="key">队列Key</param>
         /// <param name="value">入队值</param>
@@ -204,143 +209,143 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return true;
             }
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                             if redis.call('SISMEMBER', KEYS[2], ARGV[1]) == 1 then
-                                 return 0
-                             else
-                                 redis.call('RPUSH', KEYS[1], ARGV[1])
-                                 redis.call('SADD', KEYS[2], ARGV[1])
-                                 return 1
-                             end
-                         ";
+                              if redis.call('SISMEMBER', ARGV[2], ARGV[1]) == 1 then
+                                  return 0
+                              else
+                                  redis.call('RPUSH', KEYS[1], ARGV[1])
+                                  redis.call('SADD', ARGV[2], ARGV[1])
+                                  return 1
+                              end
+                          ";
 
-            var result = await CSRedisCore.EvalAsync(script, key, setKey, value);
+            var result = await CSRedisCore.EvalAsync(script, key, value, setKey);
             return (long)result == 1;
         }
 
         /// <summary>
-        /// Redis队列入队列
+        /// Redis队列入队列，泛型版本，自动序列化对象为JSON字符串
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="checkDuplicate"></param>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">入队对象</param>
+        /// <param name="checkDuplicate">是否检测重复，默认true</param>
+        /// <returns>是否成功入队</returns>
         public bool Enqueue<T>(string key, T value, bool checkDuplicate = true) where T : class
         {
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(key) || value == null)
                 return false;
 
-            if (value == null)
-                return false;
-
-            return this.Enqueue(key, JsonConvert.SerializeObject(value, JsonSetting), checkDuplicate);
+            var json = JsonConvert.SerializeObject(value, JsonSetting);
+            return Enqueue(key, json, checkDuplicate);
         }
 
         /// <summary>
-        /// Redis队列入队列
+        /// Redis队列入队列异步泛型版本，自动序列化对象为JSON字符串
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="checkDuplicate"></param>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">入队对象</param>
+        /// <param name="checkDuplicate">是否检测重复，默认true</param>
+        /// <returns>是否成功入队</returns>
         public async Task<bool> EnqueueAsync<T>(string key, T value, bool checkDuplicate = true) where T : class
         {
-            if (string.IsNullOrEmpty(key))
+            if (string.IsNullOrEmpty(key) || value == null)
                 return false;
 
-            if (value == null)
-                return false;
-
-            return await this.EnqueueAsync(key, JsonConvert.SerializeObject(value, JsonSetting), checkDuplicate);
+            var json = JsonConvert.SerializeObject(value, JsonSetting);
+            return await EnqueueAsync(key, json, checkDuplicate);
         }
 
         /// <summary>
-        /// Redis队列出队列
+        /// Redis队列出队列，返回字符串
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <returns>出队元素字符串，如果队列为空返回null</returns>
         public string Dequeue(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                local val = redis.call('LPOP', KEYS[1])
-                if val ~= false then
-                    redis.call('SREM', KEYS[2], val)
-                    return val
-                else
-                    return nil
-                end
-            ";
+                              -- 从队列头部弹出一个元素
+                              local val = redis.call('LPOP', KEYS[1])
+                              if val ~= false then
+                                  -- 弹出成功，则从Set中移除该值
+                                  redis.call('SREM', ARGV[1], val)
+                                  return val
+                              else
+                                  return nil
+                              end
+                          ";
 
             var result = CSRedisCore.Eval(script, key, setKey);
             return result?.ToString();
         }
 
         /// <summary>
-        /// Redis队列出队列
+        /// Redis队列异步出队列，返回字符串
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <returns>出队元素字符串，如果队列为空返回null</returns>
         public async Task<string> DequeueAsync(string key)
         {
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                local val = redis.call('LPOP', KEYS[1])
-                if val ~= false then
-                    redis.call('SREM', KEYS[2], val)
-                    return val
-                else
-                    return nil
-                end
-            ";
+                              local val = redis.call('LPOP', KEYS[1])
+                              if val ~= false then
+                                  redis.call('SREM', ARGV[1], val)
+                                  return val
+                              else
+                                  return nil
+                              end
+                          ";
 
             var result = await CSRedisCore.EvalAsync(script, key, setKey);
             return result?.ToString();
         }
 
         /// <summary>
-        /// Redis队列出队列
+        /// Redis队列出队列，泛型版本，自动反序列化JSON字符串
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <returns>出队对象，如果队列为空返回默认值</returns>
         public T Dequeue<T>(string key) where T : class
         {
             var str = Dequeue(key);
-
             if (string.IsNullOrEmpty(str))
                 return default;
-
             return JsonConvert.DeserializeObject<T>(str, JsonSetting);
         }
 
         /// <summary>
-        /// Redis队列出队列
+        /// Redis队列异步出队列，泛型版本，自动反序列化JSON字符串
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <returns>出队对象，如果队列为空返回默认值</returns>
         public async Task<T> DequeueAsync<T>(string key) where T : class
         {
             var str = await DequeueAsync(key);
-
             if (string.IsNullOrEmpty(str))
                 return default;
-
             return JsonConvert.DeserializeObject<T>(str, JsonSetting);
         }
 
         /// <summary>
-        /// 
+        /// 获取Redis队列长度
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <returns>队列长度，如果Key为空返回0</returns>
         public async Task<long> QueueCountAsync(string key)
         {
             if (string.IsNullOrEmpty(key))
@@ -350,54 +355,56 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
-        /// 从队列移除指定值（所有匹配项），同步移除辅助Set对应元素
+        /// 从队列移除指定值的所有匹配项（同步），同时维护辅助Set一致性
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的值</param>
         public void RemoveValueFromQueue(string key, string value)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return;
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
+                              -- 移除列表中所有匹配元素
                               redis.call('LREM', KEYS[1], 0, ARGV[1])
-                              redis.call('SREM', KEYS[2], ARGV[1])
+                              -- 同步从辅助Set中移除该元素
+                              redis.call('SREM', ARGV[2], ARGV[1])
                               return 1
                           ";
 
-            CSRedisCore.Eval(script, key, setKey, value);
+            CSRedisCore.Eval(script, key, value, setKey);
         }
 
         /// <summary>
-        /// 从队列移除指定值，指定数量（正数从头部开始，负数从尾部开始），同步移除辅助Set对应元素
+        /// 从队列移除指定值的指定数量匹配项（同步），正数从头部开始移除，负数从尾部开始移除，同时维护辅助Set
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="count"></param>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的值</param>
+        /// <param name="count">移除数量（正数从头部开始，负数从尾部开始，0移除所有匹配）</param>
         public void RemoveValueFromQueue(string key, string value, int count)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return;
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                             redis.call('LREM', KEYS[1], ARGV[2], ARGV[1])
-                             redis.call('SREM', KEYS[2], ARGV[1])
-                             return 1
-                         ";
+                              redis.call('LREM', KEYS[1], ARGV[2], ARGV[1])
+                              redis.call('SREM', ARGV[3], ARGV[1])
+                              return 1
+                          ";
 
-            CSRedisCore.Eval(script, key, setKey, value, count);
+            CSRedisCore.Eval(script, key, value, count, setKey);
         }
 
         /// <summary>
-        /// 泛型版本，序列化后移除指定值，移除所有匹配项，同步维护辅助Set
+        /// 泛型版本，序列化后移除队列中指定值的所有匹配项，同步维护辅助Set
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的对象</param>
         public void RemoveValueFromQueue<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key) || value == null)
@@ -408,12 +415,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
-        /// 泛型版本，序列化后移除指定值，指定数量，同步维护辅助Set
+        /// 泛型版本，序列化后移除队列中指定值的指定数量匹配项，同步维护辅助Set
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="count"></param>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的对象</param>
+        /// <param name="count">移除数量（正数从头部开始，负数从尾部开始，0移除所有匹配）</param>
         public void RemoveValueFromQueue<T>(string key, T value, int count) where T : class
         {
             if (string.IsNullOrEmpty(key) || value == null)
@@ -424,57 +431,57 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
-        /// 异步版本，移除指定值（所有匹配项），同步移除辅助Set对应元素
+        /// 异步版本，从队列移除指定值的所有匹配项，同时维护辅助Set
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的值</param>
+        /// <returns>任务</returns>
         public async Task RemoveValueFromQueueAsync(string key, string value)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return;
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                             redis.call('LREM', KEYS[1], 0, ARGV[1])
-                             redis.call('SREM', KEYS[2], ARGV[1])
-                             return 1
-                         ";
+                              redis.call('LREM', KEYS[1], 0, ARGV[1])
+                              redis.call('SREM', ARGV[2], ARGV[1])
+                              return 1
+                          ";
 
-            await CSRedisCore.EvalAsync(script, key, setKey, value);
+            await CSRedisCore.EvalAsync(script, key, value, setKey);
         }
 
         /// <summary>
-        /// 异步版本，移除指定值，指定数量，同步维护辅助Set
+        /// 异步版本，从队列移除指定值的指定数量匹配项，同时维护辅助Set
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的值</param>
+        /// <param name="count">移除数量（正数从头部开始，负数从尾部开始，0移除所有匹配）</param>
+        /// <returns>任务</returns>
         public async Task RemoveValueFromQueueAsync(string key, string value, int count)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return;
 
-            var setKey = key + ":set";
+            var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                             redis.call('LREM', KEYS[1], ARGV[2], ARGV[1])
-                             redis.call('SREM', KEYS[2], ARGV[1])
-                             return 1
-                         ";
+                              redis.call('LREM', KEYS[1], ARGV[2], ARGV[1])
+                              redis.call('SREM', ARGV[3], ARGV[1])
+                              return 1
+                          ";
 
-            await CSRedisCore.EvalAsync(script, key, setKey, value, count);
+            await CSRedisCore.EvalAsync(script, key, value, count, setKey);
         }
 
         /// <summary>
-        /// 异步泛型版本，序列化后移除指定值，所有匹配项，同步维护辅助Set
+        /// 异步泛型版本，序列化后移除队列中指定值的所有匹配项，同时维护辅助Set
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的对象</param>
+        /// <returns>任务</returns>
         public async Task RemoveValueFromQueueAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key) || value == null)
@@ -485,13 +492,13 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
-        /// 异步泛型版本，序列化后移除指定值，指定数量，同步维护辅助Set
+        /// 异步泛型版本，序列化后移除队列中指定值的指定数量匹配项，同时维护辅助Set
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">要移除的对象</param>
+        /// <param name="count">移除数量（正数从头部开始，负数从尾部开始，0移除所有匹配）</param>
+        /// <returns>任务</returns>
         public async Task RemoveValueFromQueueAsync<T>(string key, T value, int count) where T : class
         {
             if (string.IsNullOrEmpty(key) || value == null)
@@ -504,25 +511,24 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <summary>
         /// 检测队列中是否存在指定值（使用辅助Set检测，效率高）
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">待检测值</param>
+        /// <returns>存在返回true，不存在返回false</returns>
         public bool CheckValueExitsFromQueue(string key, string value)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
-            var setKey = key + ":set";
-            return CSRedisCore.SIsMember(setKey, value);
+            return CSRedisCore.SIsMember($"{key}:QueueHashSet", value);
         }
 
         /// <summary>
         /// 泛型版本，检测队列中是否存在指定值（序列化后，使用辅助Set检测）
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">待检测对象</param>
+        /// <returns>存在返回true，不存在返回false</returns>
         public bool CheckValueExitsFromQueue<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key) || value == null)
@@ -533,27 +539,26 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
-        /// 异步版本，检测队列中是否存在指定值（使用辅助Set检测）
+        /// 异步版本，检测队列中是否存在指定值（使用辅助Set检测，效率高）
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">待检测值</param>
+        /// <returns>任务，结果存在返回true，不存在返回false</returns>
         public async Task<bool> CheckValueExitsFromQueueAsync(string key, string value)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
-            var setKey = key + ":set";
-            return await CSRedisCore.SIsMemberAsync(setKey, value);
+            return await CSRedisCore.SIsMemberAsync($"{key}:QueueHashSet", value);
         }
 
         /// <summary>
         /// 异步泛型版本，检测队列中是否存在指定值（序列化后，使用辅助Set检测）
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">对象类型</typeparam>
+        /// <param name="key">队列Key</param>
+        /// <param name="value">待检测对象</param>
+        /// <returns>任务，结果存在返回true，不存在返回false</returns>
         public async Task<bool> CheckValueExitsFromQueueAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key) || value == null)
