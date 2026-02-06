@@ -48,6 +48,8 @@ app.MapGet("/weatherforecast", async () =>
 
     var result3 = await RedisCache.Utils.CheckValueExitsFromQueueAsync("test_demo", new { index = 3.ToString() });
 
+    await RedisCache.Utils.RemoveValueFromQueueAsync("test_demo", new { index = 3.ToString() });
+
     var result4 = await RedisCache.Utils.DequeueAsync("test_demo");
 
     var cache = await RedisCache.String.GetAsync("testdemo");

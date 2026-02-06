@@ -164,36 +164,27 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
-            // 不检查重复，直接入队
-            if (!checkDuplicate)
-            {
-                CSRedisCore.RPush(key, value);
-                return true;
-            }
-
-            // 辅助的Set Key，用于唯一性检测
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                            local queueKey = KEYS[1]
-                            local countHashKey = ARGV[2]
-                            local val = ARGV[1]
-                            local checkDuplicate = tonumber(ARGV[3])
-                            
-                            if checkDuplicate == 1 then
-                                local count = tonumber(redis.call('HGET', countHashKey, val) or ""0"")
-                                if count > 0 then
-                                    return 0 -- 重复且不入队
-                                end
-                            end
-                            
-                            redis.call('RPUSH', queueKey, val)
-                            redis.call('HINCRBY', countHashKey, val, 1)
-                            return 1
-                          ";
+                    local queueKey = KEYS[1]
+                    local countHashKey = ARGV[2]
+                    local val = ARGV[1]
+                    local checkDuplicate = tonumber(ARGV[3])
+                    
+                    if checkDuplicate == 1 then
+                        local count = tonumber(redis.call('HGET', countHashKey, val) or '0')
+                        if count > 0 then
+                            return 0 -- 重复且不入队
+                        end
+                    end
+                    
+                    redis.call('RPUSH', queueKey, val)
+                    redis.call('HINCRBY', countHashKey, val, 1)
+                    return 1
+                  ";
 
-            // KEYS[1] 是主队列key，ARGV[1]是value，ARGV[2]是setKey
-            var result = CSRedisCore.Eval(script, key, value, setKey);
+            var result = CSRedisCore.Eval(script, key, value, setKey, checkDuplicate ? "1" : "0");
             return (long)result == 1;
         }
 
@@ -209,33 +200,27 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
-            if (!checkDuplicate)
-            {
-                await CSRedisCore.RPushAsync(key, value);
-                return true;
-            }
-
             var setKey = string.IsNullOrEmpty(this.PrefixCacheKey) ? $"{key}:QueueHashSet" : $"{this.PrefixCacheKey.TrimEnd(':')}:{key}:QueueHashSet";
 
             var script = @"
-                            local queueKey = KEYS[1]
-                            local countHashKey = ARGV[2]
-                            local val = ARGV[1]
-                            local checkDuplicate = tonumber(ARGV[3])
-                            
-                            if checkDuplicate == 1 then
-                                local count = tonumber(redis.call('HGET', countHashKey, val) or ""0"")
-                                if count > 0 then
-                                    return 0 -- 重复且不入队
-                                end
-                            end
-                            
-                            redis.call('RPUSH', queueKey, val)
-                            redis.call('HINCRBY', countHashKey, val, 1)
-                            return 1
-                          ";
+                    local queueKey = KEYS[1]
+                    local countHashKey = ARGV[2]
+                    local val = ARGV[1]
+                    local checkDuplicate = tonumber(ARGV[3])
+                    
+                    if checkDuplicate == 1 then
+                        local count = tonumber(redis.call('HGET', countHashKey, val) or '0')
+                        if count > 0 then
+                            return 0 -- 重复且不入队
+                        end
+                    end
+                    
+                    redis.call('RPUSH', queueKey, val)
+                    redis.call('HINCRBY', countHashKey, val, 1)
+                    return 1
+                  ";
 
-            var result = await CSRedisCore.EvalAsync(script, key, value, setKey);
+            var result = await CSRedisCore.EvalAsync(script, key, value, setKey, checkDuplicate ? "1" : "0");
             return (long)result == 1;
         }
 
@@ -561,7 +546,16 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
-            return CSRedisCore.SIsMember($"{key}:QueueHashSet", value);
+            // 用 HGET 判断是否存在
+            var countStr = CSRedisCore.HGet($"{key}:QueueHashSet", value);
+
+            if (string.IsNullOrEmpty(countStr))
+                return false;
+
+            if (int.TryParse(countStr, out int count))
+                return count > 0;
+
+            return false;
         }
 
         /// <summary>
@@ -591,7 +585,16 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value))
                 return false;
 
-            return await CSRedisCore.SIsMemberAsync($"{key}:QueueHashSet", value);
+            // 用 HGET 判断是否存在
+            var countStr = await CSRedisCore.HGetAsync($"{key}:QueueHashSet", value);
+
+            if (string.IsNullOrEmpty(countStr))
+                return false;
+
+            if (int.TryParse(countStr, out int count))
+                return count > 0;
+
+            return false;
         }
 
         /// <summary>
