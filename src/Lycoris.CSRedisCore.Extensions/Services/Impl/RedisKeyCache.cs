@@ -21,7 +21,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         public RedisKeyCache(CSRedisClient CSRedisCore, string PrefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
-            this.PrefixCacheKey = string.IsNullOrEmpty(PrefixCacheKey) ? "" : $"{PrefixCacheKey}:";
+            this.PrefixCacheKey = PrefixCacheKey;
         }
 
         /// <summary>

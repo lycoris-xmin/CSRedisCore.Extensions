@@ -22,11 +22,12 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// </summary>
         /// <param name="CSRedisCore"></param>
         /// <param name="JsonSetting"></param>
+        /// <param name="prefixCacheKey"></param>
         public RedisCacheUtils(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting, string prefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
             this.JsonSetting = JsonSetting;
-            PrefixCacheKey = prefixCacheKey;
+            this.PrefixCacheKey = prefixCacheKey;
         }
 
         /// <summary>
