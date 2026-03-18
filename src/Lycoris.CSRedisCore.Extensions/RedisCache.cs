@@ -64,7 +64,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_String != null)
                     return _String;
 
-                _String = new RedisStringCache(Client, JsonSetting);
+                _String = new RedisStringCache(Client, JsonSetting, PrefixCacheKey);
                 return _String;
             }
         }
@@ -81,7 +81,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Hash != null)
                     return _Hash;
 
-                _Hash = new RedisHashCache(Client, JsonSetting);
+                _Hash = new RedisHashCache(Client, JsonSetting, PrefixCacheKey);
                 return _Hash;
             }
         }
@@ -98,7 +98,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_List != null)
                     return _List;
 
-                _List = new RedisListCache(Client, JsonSetting);
+                _List = new RedisListCache(Client, JsonSetting, PrefixCacheKey);
                 return _List;
             }
         }
@@ -115,7 +115,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Set != null)
                     return _Set;
 
-                _Set = new RedisSetCache(Client, JsonSetting);
+                _Set = new RedisSetCache(Client, JsonSetting, PrefixCacheKey);
                 return _Set;
             }
         }
@@ -132,7 +132,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Sort != null)
                     return _Sort;
 
-                _Sort = new RedisSortCache(Client, JsonSetting);
+                _Sort = new RedisSortCache(Client, JsonSetting, PrefixCacheKey);
                 return _Sort;
             }
         }

@@ -14,16 +14,19 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
     {
         private readonly CSRedisClient CSRedisCore;
         private readonly JsonSerializerSettings JsonSetting;
+        private readonly string PrefixCacheKey;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="CSRedisCore"></param>
         /// <param name="JsonSetting"></param>
-        public RedisStringCache(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting)
+        /// <param name="prefixCacheKey"></param>
+        public RedisStringCache(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting, string prefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
             this.JsonSetting = JsonSetting;
+            PrefixCacheKey = prefixCacheKey;
         }
 
         /// <summary>
