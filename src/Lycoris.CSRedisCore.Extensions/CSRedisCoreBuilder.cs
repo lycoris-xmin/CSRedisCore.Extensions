@@ -20,7 +20,8 @@ namespace Lycoris.CSRedisCore.Extensions
             var configuretaion = new RedisConiguration();
             configure(configuretaion);
             RedisCache.Client = configuretaion.HasSentinels ? new CSRedisClient(configuretaion.ToString(), configuretaion.Sentinels) : new CSRedisClient(configuretaion.ToString());
-            RedisCache.PrefixCacheKey = $"{configuretaion.Prefix.TrimEnd(':')}:";
+            RedisStore.SetPrefixCacheKey(configuretaion.Prefix);
+            RedisStore.SetJsonSerializerSettings(configuretaion.NewtonsoftJsonSerializerSettings);
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Lycoris.CSRedisCore.Extensions
             if (RedisCacheFactory.RedisJsonSerializerSettings == null)
                 RedisCacheFactory.RedisJsonSerializerSettings = new Dictionary<string, JsonSerializerSettings>();
 
-            RedisCacheFactory.RedisJsonSerializerSettings.Add(instanceName, configuretaion.NewtonsoftJsonSerializerSettings);
+            RedisCacheFactory.RedisJsonSerializerSettings.Add(instanceName, configuretaion.NewtonsoftJsonSerializerSettings ?? RedisStore.Settings);
         }
     }
 }

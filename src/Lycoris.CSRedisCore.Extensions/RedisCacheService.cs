@@ -2,7 +2,6 @@
 using Lycoris.CSRedisCore.Extensions.Services;
 using Lycoris.CSRedisCore.Extensions.Services.Impl;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Threading.Tasks;
 
@@ -37,16 +36,10 @@ namespace Lycoris.CSRedisCore.Extensions
         public RedisCacheService(CSRedisClient Command, JsonSerializerSettings JsonSerializerSetting, string prefixCackeKey)
         {
             this.Command = Command;
-            JsonSetting = JsonSerializerSetting ?? new JsonSerializerSettings()
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                DateFormatString = "yyyy-MM-dd HH:mm:ss.ffffff",
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                NullValueHandling = NullValueHandling.Ignore,
-                MaxDepth = 200
-            };
+            JsonSetting = JsonSerializerSetting ?? RedisStore.Settings;
             PrefixCacheKey = $"{prefixCackeKey.TrimEnd(':')}:";
         }
+
 
         private IRedisKeyCache _Key = null;
         /// <summary>
@@ -59,7 +52,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Key != null)
                     return _Key;
 
-                _Key = new RedisKeyCache(Command, this.PrefixCacheKey);
+                _Key = new RedisKeyCache(Command, RedisStore.PrefixCacheKey);
                 return _Key;
             }
         }

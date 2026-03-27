@@ -1,8 +1,6 @@
 ﻿using CSRedis;
 using Lycoris.CSRedisCore.Extensions.Services;
 using Lycoris.CSRedisCore.Extensions.Services.Impl;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Lycoris.CSRedisCore.Extensions
 {
@@ -19,22 +17,6 @@ namespace Lycoris.CSRedisCore.Extensions
         /// <summary>
         /// 
         /// </summary>
-        internal static string PrefixCacheKey = "";
-
-        /// <summary>
-        /// Json序列化配置
-        /// </summary>
-        internal static JsonSerializerSettings JsonSetting { get; set; } = new JsonSerializerSettings()
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            DateFormatString = "yyyy-MM-dd HH:mm:ss.ffffff",
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore
-        };
-
-        /// <summary>
-        /// 
-        /// </summary>
         private static IRedisKeyCache _Key = null;
         /// <summary>
         /// 键操作
@@ -46,7 +28,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Key != null)
                     return _Key;
 
-                _Key = new RedisKeyCache(Client, PrefixCacheKey);
+                _Key = new RedisKeyCache(Client, RedisStore.PrefixCacheKey);
 
                 return _Key;
             }
@@ -64,7 +46,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_String != null)
                     return _String;
 
-                _String = new RedisStringCache(Client, JsonSetting, PrefixCacheKey);
+                _String = new RedisStringCache(Client, RedisStore.Settings, RedisStore.PrefixCacheKey);
                 return _String;
             }
         }
@@ -81,7 +63,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Hash != null)
                     return _Hash;
 
-                _Hash = new RedisHashCache(Client, JsonSetting, PrefixCacheKey);
+                _Hash = new RedisHashCache(Client, RedisStore.Settings, RedisStore.PrefixCacheKey);
                 return _Hash;
             }
         }
@@ -98,7 +80,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_List != null)
                     return _List;
 
-                _List = new RedisListCache(Client, JsonSetting, PrefixCacheKey);
+                _List = new RedisListCache(Client, RedisStore.Settings, RedisStore.PrefixCacheKey);
                 return _List;
             }
         }
@@ -115,7 +97,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Set != null)
                     return _Set;
 
-                _Set = new RedisSetCache(Client, JsonSetting, PrefixCacheKey);
+                _Set = new RedisSetCache(Client, RedisStore.Settings, RedisStore.PrefixCacheKey);
                 return _Set;
             }
         }
@@ -132,7 +114,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Sort != null)
                     return _Sort;
 
-                _Sort = new RedisSortCache(Client, JsonSetting, PrefixCacheKey);
+                _Sort = new RedisSortCache(Client, RedisStore.Settings, RedisStore.PrefixCacheKey);
                 return _Sort;
             }
         }
@@ -149,7 +131,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Message != null)
                     return _Message;
 
-                _Message = new RedisEventMessage(Client, JsonSetting);
+                _Message = new RedisEventMessage(Client, RedisStore.Settings);
                 return _Message;
             }
         }
@@ -166,7 +148,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Utils != null)
                     return _Utils;
 
-                _Utils = new RedisCacheUtils(Client, JsonSetting, PrefixCacheKey);
+                _Utils = new RedisCacheUtils(Client, RedisStore.Settings, RedisStore.PrefixCacheKey);
                 return _Utils;
             }
         }
@@ -183,7 +165,7 @@ namespace Lycoris.CSRedisCore.Extensions
                 if (_Monitor != null)
                     return _Monitor;
 
-                _Monitor = new MonitorService(Client, JsonSetting);
+                _Monitor = new MonitorService(Client, RedisStore.Settings);
                 return _Monitor;
             }
         }
