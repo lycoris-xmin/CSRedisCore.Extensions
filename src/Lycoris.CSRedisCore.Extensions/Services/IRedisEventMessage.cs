@@ -48,5 +48,6 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="channels"></param>
         /// <returns></returns>
         PSubscribeObject PSubscribe(Action<PSubscribePMessageEventArgs> action, params string[] channels);
+
     }
 }

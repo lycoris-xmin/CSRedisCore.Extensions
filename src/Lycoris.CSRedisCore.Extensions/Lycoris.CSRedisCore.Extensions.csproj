@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
+		<_EnableDefaultWindowsPlatform>false</_EnableDefaultWindowsPlatform>
+		<RestoreProjectStyle>None</RestoreProjectStyle>
+		<RestoreConfigFile>$(MSBuildThisFileDirectory)..\..\NuGet.Config</RestoreConfigFile>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Title>Lycoris.CSRedisCore.Extensions</Title>
 		<Version>8.0.7</Version>
@@ -14,9 +17,11 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="CSRedisCore" Version="3.8.807" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<Reference Include="CSRedisCore">
+			<HintPath>C:\Users\lycoris\.nuget\packages\csrediscore\3.8.807\lib\netstandard2.0\CSRedisCore.dll</HintPath>
+		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>C:\Users\lycoris\.nuget\packages\newtonsoft.json\13.0.4\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 </Project>

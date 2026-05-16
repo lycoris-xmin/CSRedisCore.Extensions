@@ -265,5 +265,37 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
             return result;
         }
+
+        public long PTTL(string key) => string.IsNullOrEmpty(key) ? 0 : CSRedisCore.PTtl(key);
+
+        public async Task<long> PTTLAsync(string key) => string.IsNullOrEmpty(key) ? 0 : await CSRedisCore.PTtlAsync(key);
+
+        public bool PExpire(string key, int milliseconds) => !string.IsNullOrEmpty(key) && CSRedisCore.PExpire(key, milliseconds);
+
+        public async Task<bool> PExpireAsync(string key, int milliseconds) => !string.IsNullOrEmpty(key) && await CSRedisCore.PExpireAsync(key, milliseconds);
+
+        public KeyType Type(string key) => string.IsNullOrEmpty(key) ? KeyType.None : CSRedisCore.Type(key);
+
+        public async Task<KeyType> TypeAsync(string key) => string.IsNullOrEmpty(key) ? KeyType.None : await CSRedisCore.TypeAsync(key);
+
+        public Models.RedisScanResult<string[]> Scan(long cursor, string pattern = null, long? count = null)
+        {
+            var result = CSRedisCore.Scan(cursor, pattern ?? $"{this.PrefixCacheKey}*", count ?? 100);
+            return new Models.RedisScanResult<string[]> { Cursor = result.Cursor, Items = result.Items };
+        }
+
+        public async Task<Models.RedisScanResult<string[]>> ScanAsync(long cursor, string pattern = null, long? count = null)
+        {
+            var result = await CSRedisCore.ScanAsync(cursor, pattern ?? $"{this.PrefixCacheKey}*", count ?? 100);
+            return new Models.RedisScanResult<string[]> { Cursor = result.Cursor, Items = result.Items };
+        }
+
+        public string RandomKey() => CSRedisCore.RandomKey();
+
+        public async Task<string> RandomKeyAsync() => await CSRedisCore.RandomKeyAsync();
+
+        public bool ExpireAt(string key, DateTime expire) => !string.IsNullOrEmpty(key) && CSRedisCore.ExpireAt(key, expire);
+
+        public async Task<bool> ExpireAtAsync(string key, DateTime expire) => !string.IsNullOrEmpty(key) && await CSRedisCore.ExpireAtAsync(key, expire);
     }
 }

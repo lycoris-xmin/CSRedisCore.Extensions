@@ -50,7 +50,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="member"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public long Add(string key, string member, decimal source) => CSRedisCore.ZAdd(key, (source, member));
+        public long Add(string key, string member, decimal source) => CSRedisCore.ZAdd(key, (source, (object)member));
 
         /// <summary>
         /// 向有序集合添加一个或多个成员，或者更新已存在成员的分数
@@ -59,7 +59,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <param name="member"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<long> AddAsync(string key, string member, decimal source) => await CSRedisCore.ZAddAsync(key, (source, member));
+        public async Task<long> AddAsync(string key, string member, decimal source) => await CSRedisCore.ZAddAsync(key, (source, (object)member));
 
         /// <summary>
         /// 移除有序集合中的一个或多个成员
@@ -450,18 +450,82 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         /// <returns></returns>
         public Task<decimal?> GetScoreAsync(string key, string member) => CSRedisCore.ZScoreAsync(key, member);
 
-        /// <summary>
-        /// 获取有序集合中的所有元素
-        /// </summary>
-        /// <param name="key">有序集合的 Redis 键</param>
-        /// <returns>有序集合中的所有元素（包含成员和值）</returns>
         public async Task<Dictionary<string, decimal>> GetAllAsync(string key)
         {
-            // 使用 ZRangeWithScores 获取有序集合的所有成员及其分数
             var items = await CSRedisCore.ZRangeWithScoresAsync(key, 0, -1);
-
-            // items 是一个元组 (member, score)
             return items.ToDictionary(x => x.member, x => x.score);
+        }
+
+        public Dictionary<string, decimal> GetAll(string key)
+        {
+            var items = CSRedisCore.ZRangeWithScores(key, 0, -1);
+            return items.ToDictionary(x => x.member, x => x.score);
+        }
+
+        public long CountByScore(string key, decimal min, decimal max) => CSRedisCore.ZCount(key, min, max);
+
+        public async Task<long> CountByScoreAsync(string key, decimal min, decimal max) => await CSRedisCore.ZCountAsync(key, min, max);
+
+        public long SetMultiple(string key, params (decimal, string)[] members) => CSRedisCore.ZAdd(key, members.Select(x => (x.Item1, (object)x.Item2)).ToArray());
+
+        public async Task<long> SetMultipleAsync(string key, params (decimal, string)[] members) => await CSRedisCore.ZAddAsync(key, members.Select(x => (x.Item1, (object)x.Item2)).ToArray());
+
+        public string[] GetRangeByRank(string key, long start, long stop) => CSRedisCore.ZRange(key, start, stop);
+
+        public async Task<string[]> GetRangeByRankAsync(string key, long start, long stop) => await CSRedisCore.ZRangeAsync(key, start, stop);
+
+        public Dictionary<string, decimal> GetRangeByRankWithScores(string key, long start, long stop)
+        {
+            var cache = CSRedisCore.ZRangeWithScores(key, start, stop);
+            return cache.ToDictionary(x => x.member, x => x.score);
+        }
+
+        public async Task<Dictionary<string, decimal>> GetRangeByRankWithScoresAsync(string key, long start, long stop)
+        {
+            var cache = await CSRedisCore.ZRangeWithScoresAsync(key, start, stop);
+            return cache.ToDictionary(x => x.member, x => x.score);
+        }
+
+        public string[] GetRevRangeByRank(string key, long start, long stop) => CSRedisCore.ZRevRange(key, start, stop);
+
+        public async Task<string[]> GetRevRangeByRankAsync(string key, long start, long stop) => await CSRedisCore.ZRevRangeAsync(key, start, stop);
+
+        public Dictionary<string, decimal> GetRevRangeByRankWithScores(string key, long start, long stop)
+        {
+            var cache = CSRedisCore.ZRevRangeWithScores(key, start, stop);
+            return cache.ToDictionary(x => x.member, x => x.score);
+        }
+
+        public async Task<Dictionary<string, decimal>> GetRevRangeByRankWithScoresAsync(string key, long start, long stop)
+        {
+            var cache = await CSRedisCore.ZRevRangeWithScoresAsync(key, start, stop);
+            return cache.ToDictionary(x => x.member, x => x.score);
+        }
+
+        public long RemoveByScore(string key, decimal min, decimal max) => CSRedisCore.ZRemRangeByScore(key, min, max);
+
+        public async Task<long> RemoveByScoreAsync(string key, decimal min, decimal max) => await CSRedisCore.ZRemRangeByScoreAsync(key, min, max);
+
+        public long? RankAscending(string key, string member) => CSRedisCore.ZRank(key, member);
+
+        public async Task<long?> RankAscendingAsync(string key, string member) => await CSRedisCore.ZRankAsync(key, member);
+
+        public Models.RedisScanResult<Dictionary<string, decimal>> Scan(string key, long cursor, string pattern = null, long? count = null)
+        {
+            var result = CSRedisCore.ZScan(key, cursor, pattern, count ?? 100);
+            var dic = new Dictionary<string, decimal>();
+            foreach (var (member, score) in result.Items)
+                dic[member] = score;
+            return new Models.RedisScanResult<Dictionary<string, decimal>> { Cursor = result.Cursor, Items = dic };
+        }
+
+        public async Task<Models.RedisScanResult<Dictionary<string, decimal>>> ScanAsync(string key, long cursor, string pattern = null, long? count = null)
+        {
+            var result = await CSRedisCore.ZScanAsync(key, cursor, pattern, count ?? 100);
+            var dic = new Dictionary<string, decimal>();
+            foreach (var (member, score) in result.Items)
+                dic[member] = score;
+            return new Models.RedisScanResult<Dictionary<string, decimal>> { Cursor = result.Cursor, Items = dic };
         }
     }
 }

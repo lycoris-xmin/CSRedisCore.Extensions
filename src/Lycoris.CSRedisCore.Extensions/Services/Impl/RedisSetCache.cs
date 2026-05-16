@@ -159,16 +159,88 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return JsonConvert.DeserializeObject<T>(cache, JsonSetting);
         }
 
-        /// <summary>
-        /// 获取集合的所有元素（用于展示）
-        /// </summary>
-        /// <param name="setKey">集合的 Redis 键</param>
-        /// <returns>集合中的所有元素</returns>
-        public async Task<List<string>> GetAllAsync(string setKey)
+        public async Task<List<string>> GetAllAsync(string setKey) => (await CSRedisCore.SMembersAsync(setKey)).ToList();
+
+        public List<string> GetAll(string setKey) => CSRedisCore.SMembers(setKey).ToList();
+
+        public long Remove(string key, params string[] value) => CSRedisCore.SRem(key, value);
+
+        public async Task<long> RemoveAsync(string key, params string[] value) => await CSRedisCore.SRemAsync(key, value);
+
+        public long Remove<T>(string key, params T[] value) where T : class
         {
-            // 使用 SMEMBERS 获取集合所有元素
-            var items = await CSRedisCore.SMembersAsync(setKey);
-            return items.ToList();
+            var list = new List<string>();
+            foreach (var item in value)
+                list.Add(JsonConvert.SerializeObject(item, JsonSetting));
+            return CSRedisCore.SRem(key, list.ToArray());
+        }
+
+        public async Task<long> RemoveAsync<T>(string key, params T[] value) where T : class
+        {
+            var list = new List<string>();
+            foreach (var item in value)
+                list.Add(JsonConvert.SerializeObject(item, JsonSetting));
+            return await CSRedisCore.SRemAsync(key, list.ToArray());
+        }
+
+        public string RandomMember(string key) => CSRedisCore.SRandMember(key);
+
+        public async Task<string> RandomMemberAsync(string key) => await CSRedisCore.SRandMemberAsync(key);
+
+        public T RandomMember<T>(string key) where T : class
+        {
+            var str = CSRedisCore.SRandMember(key);
+            return string.IsNullOrEmpty(str) ? default : JsonConvert.DeserializeObject<T>(str);
+        }
+
+        public async Task<T> RandomMemberAsync<T>(string key) where T : class
+        {
+            var str = await CSRedisCore.SRandMemberAsync(key);
+            return string.IsNullOrEmpty(str) ? default : JsonConvert.DeserializeObject<T>(str);
+        }
+
+        public string[] RandomMembers(string key, int count) => CSRedisCore.SRandMembers(key, count);
+
+        public async Task<string[]> RandomMembersAsync(string key, int count) => await CSRedisCore.SRandMembersAsync(key, count);
+
+        public bool Move(string sourceKey, string targetKey, string value) => CSRedisCore.SMove(sourceKey, targetKey, value);
+
+        public async Task<bool> MoveAsync(string sourceKey, string targetKey, string value) => await CSRedisCore.SMoveAsync(sourceKey, targetKey, value);
+
+        public string[] Difference(params string[] keys) => CSRedisCore.SDiff(keys);
+
+        public async Task<string[]> DifferenceAsync(params string[] keys) => await CSRedisCore.SDiffAsync(keys);
+
+        public long DifferenceStore(string targetKey, params string[] keys) => CSRedisCore.SDiffStore(targetKey, keys);
+
+        public async Task<long> DifferenceStoreAsync(string targetKey, params string[] keys) => await CSRedisCore.SDiffStoreAsync(targetKey, keys);
+
+        public string[] Intersection(params string[] keys) => CSRedisCore.SInter(keys);
+
+        public async Task<string[]> IntersectionAsync(params string[] keys) => await CSRedisCore.SInterAsync(keys);
+
+        public long IntersectionStore(string targetKey, params string[] keys) => CSRedisCore.SInterStore(targetKey, keys);
+
+        public async Task<long> IntersectionStoreAsync(string targetKey, params string[] keys) => await CSRedisCore.SInterStoreAsync(targetKey, keys);
+
+        public string[] Union(params string[] keys) => CSRedisCore.SUnion(keys);
+
+        public async Task<string[]> UnionAsync(params string[] keys) => await CSRedisCore.SUnionAsync(keys);
+
+        public long UnionStore(string targetKey, params string[] keys) => CSRedisCore.SUnionStore(targetKey, keys);
+
+        public async Task<long> UnionStoreAsync(string targetKey, params string[] keys) => await CSRedisCore.SUnionStoreAsync(targetKey, keys);
+
+        public Models.RedisScanResult<string[]> Scan(string key, long cursor, string pattern = null, long? count = null)
+        {
+            var result = CSRedisCore.SScan(key, cursor, pattern, count ?? 100);
+            return new Models.RedisScanResult<string[]> { Cursor = result.Cursor, Items = result.Items };
+        }
+
+        public async Task<Models.RedisScanResult<string[]>> ScanAsync(string key, long cursor, string pattern = null, long? count = null)
+        {
+            var result = await CSRedisCore.SScanAsync(key, cursor, pattern, count ?? 100);
+            return new Models.RedisScanResult<string[]> { Cursor = result.Cursor, Items = result.Items };
         }
     }
 }

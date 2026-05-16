@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(CSRedisCore.StringLength)",
+      "Bash(CSRedisCore.StrLen)",
+      "Bash(CSRedisCore.HFieldStringLength)",
+      "Bash(CSRedisCore.HStrLen)",
+      "Bash(node C:/Users/lycoris/.claude/plugins/cache/openai-codex/codex/1.0.4/scripts/codex-companion.mjs task --write '<task> *)",
+      "Bash(node *)"
+    ]
+  }
+}

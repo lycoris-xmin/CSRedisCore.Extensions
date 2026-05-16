@@ -478,5 +478,35 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
             return value;
         }
+
+        public decimal IncrByFloat(string key, string fieId, decimal value) => CSRedisCore.HIncrByFloat(key, fieId, value);
+
+        public async Task<decimal> IncrByFloatAsync(string key, string fieId, decimal value) => await CSRedisCore.HIncrByFloatAsync(key, fieId, value);
+
+        public List<string> Values(string key) => CSRedisCore.HVals(key)?.ToList() ?? new List<string>();
+
+        public async Task<List<string>> ValuesAsync(string key) => (await CSRedisCore.HValsAsync(key))?.ToList() ?? new List<string>();
+
+        public long FieldStringLength(string key, string fieId) => CSRedisCore.HStrLen(key, fieId);
+
+        public async Task<long> FieldStringLengthAsync(string key, string fieId) => await CSRedisCore.HStrLenAsync(key, fieId);
+
+        public Models.RedisScanResult<Dictionary<string, string>> Scan(string key, long cursor, string pattern = null, long? count = null)
+        {
+            var result = CSRedisCore.HScan(key, cursor, pattern, count ?? 100);
+            var dic = new Dictionary<string, string>();
+            foreach (var (field, value) in result.Items)
+                dic[field] = value;
+            return new Models.RedisScanResult<Dictionary<string, string>> { Cursor = result.Cursor, Items = dic };
+        }
+
+        public async Task<Models.RedisScanResult<Dictionary<string, string>>> ScanAsync(string key, long cursor, string pattern = null, long? count = null)
+        {
+            var result = await CSRedisCore.HScanAsync(key, cursor, pattern, count ?? 100);
+            var dic = new Dictionary<string, string>();
+            foreach (var (field, value) in result.Items)
+                dic[field] = value;
+            return new Models.RedisScanResult<Dictionary<string, string>> { Cursor = result.Cursor, Items = dic };
+        }
     }
 }

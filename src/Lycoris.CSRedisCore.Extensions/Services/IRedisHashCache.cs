@@ -289,5 +289,45 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="timeSpan">过期时间</param>
         /// <returns></returns>
         Task<long> AdditionAsync(string key, string fieId, long value = 1, TimeSpan? timeSpan = null);
+
+        /// <summary>
+        /// 为哈希表 key 中的指定字段加上浮点增量
+        /// </summary>
+        decimal IncrByFloat(string key, string fieId, decimal value);
+
+        /// <summary>
+        /// 为哈希表 key 中的指定字段加上浮点增量
+        /// </summary>
+        Task<decimal> IncrByFloatAsync(string key, string fieId, decimal value);
+
+        /// <summary>
+        /// 获取哈希表中所有字段的值（不返回键名）
+        /// </summary>
+        List<string> Values(string key);
+
+        /// <summary>
+        /// 获取哈希表中所有字段的值（不返回键名）
+        /// </summary>
+        Task<List<string>> ValuesAsync(string key);
+
+        /// <summary>
+        /// 获取哈希表指定字段值的字符串长度
+        /// </summary>
+        long FieldStringLength(string key, string fieId);
+
+        /// <summary>
+        /// 获取哈希表指定字段值的字符串长度
+        /// </summary>
+        Task<long> FieldStringLengthAsync(string key, string fieId);
+
+        /// <summary>
+        /// 迭代遍历哈希表中的键值对
+        /// </summary>
+        Models.RedisScanResult<Dictionary<string, string>> Scan(string key, long cursor, string pattern = null, long? count = null);
+
+        /// <summary>
+        /// 迭代遍历哈希表中的键值对
+        /// </summary>
+        Task<Models.RedisScanResult<Dictionary<string, string>>> ScanAsync(string key, long cursor, string pattern = null, long? count = null);
     }
 }

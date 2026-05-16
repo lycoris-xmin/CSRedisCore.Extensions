@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSRedis;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -127,9 +128,68 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         Task<bool> RemoveAsync(params string[] key);
 
         /// <summary>
-        /// 
+        /// 获取所有 key 的详细信息（类型、TTL等）
         /// </summary>
-        /// <returns></returns>
         Task<List<RedisKeyInfo>> GetAllRedisKeysInfoAsync();
+
+        /// <summary>
+        /// 以毫秒返回 key 的剩余生存时间
+        /// </summary>
+        long PTTL(string key);
+
+        /// <summary>
+        /// 以毫秒返回 key 的剩余生存时间
+        /// </summary>
+        Task<long> PTTLAsync(string key);
+
+        /// <summary>
+        /// 以毫秒为单位设置 key 过期时间
+        /// </summary>
+        bool PExpire(string key, int milliseconds);
+
+        /// <summary>
+        /// 以毫秒为单位设置 key 过期时间
+        /// </summary>
+        Task<bool> PExpireAsync(string key, int milliseconds);
+
+        /// <summary>
+        /// 获取 key 的数据类型
+        /// </summary>
+        KeyType Type(string key);
+
+        /// <summary>
+        /// 获取 key 的数据类型
+        /// </summary>
+        Task<KeyType> TypeAsync(string key);
+
+        /// <summary>
+        /// 游标迭代所有 key
+        /// </summary>
+        Models.RedisScanResult<string[]> Scan(long cursor, string pattern = null, long? count = null);
+
+        /// <summary>
+        /// 游标迭代所有 key
+        /// </summary>
+        Task<Models.RedisScanResult<string[]>> ScanAsync(long cursor, string pattern = null, long? count = null);
+
+        /// <summary>
+        /// 随机返回一个 key
+        /// </summary>
+        string RandomKey();
+
+        /// <summary>
+        /// 随机返回一个 key
+        /// </summary>
+        Task<string> RandomKeyAsync();
+
+        /// <summary>
+        /// 以 Unix 时间戳（秒）设置 key 过期时间
+        /// </summary>
+        bool ExpireAt(string key, DateTime expire);
+
+        /// <summary>
+        /// 以 Unix 时间戳（秒）设置 key 过期时间
+        /// </summary>
+        Task<bool> ExpireAtAsync(string key, DateTime expire);
     }
 }

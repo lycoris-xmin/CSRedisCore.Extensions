@@ -320,16 +320,86 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             await CSRedisCore.RPushAsync(key, list.ToArray());
         }
 
-        /// <summary>
-        /// 获取列表的所有元素
-        /// </summary>
-        /// <param name="key">列表的 Redis 键</param>
-        /// <returns>列表中的所有元素</returns>
-        public async Task<List<string>> GetAllAsync(string key)
+        public async Task<List<string>> GetAllAsync(string key) => (await CSRedisCore.LRangeAsync(key, 0, -1)).ToList();
+
+        public List<string> GetAll(string key) => CSRedisCore.LRange(key, 0, -1).ToList();
+
+        public string GetByIndex(string key, long index) => CSRedisCore.LIndex(key, index);
+
+        public async Task<string> GetByIndexAsync(string key, long index) => await CSRedisCore.LIndexAsync(key, index);
+
+        public T GetByIndex<T>(string key, long index) where T : class
         {
-            // 使用 LRANGE 获取列表所有元素，从索引 0 到 -1
-            var items = await CSRedisCore.LRangeAsync(key, 0, -1);
-            return items.ToList();
+            var str = GetByIndex(key, index);
+            return string.IsNullOrEmpty(str) ? default : JsonConvert.DeserializeObject<T>(str);
         }
+
+        public async Task<T> GetByIndexAsync<T>(string key, long index) where T : class
+        {
+            var str = await GetByIndexAsync(key, index);
+            return string.IsNullOrEmpty(str) ? default : JsonConvert.DeserializeObject<T>(str);
+        }
+
+        public List<string> GetRange(string key, long start, long stop) => CSRedisCore.LRange(key, start, stop).ToList();
+
+        public async Task<List<string>> GetRangeAsync(string key, long start, long stop) => (await CSRedisCore.LRangeAsync(key, start, stop)).ToList();
+
+        public List<T> GetRange<T>(string key, long start, long stop) where T : class
+        {
+            var items = GetRange(key, start, stop);
+            var result = new List<T>();
+            foreach (var item in items)
+                result.Add(string.IsNullOrEmpty(item) ? default : JsonConvert.DeserializeObject<T>(item));
+            return result;
+        }
+
+        public async Task<List<T>> GetRangeAsync<T>(string key, long start, long stop) where T : class
+        {
+            var items = await GetRangeAsync(key, start, stop);
+            var result = new List<T>();
+            foreach (var item in items)
+                result.Add(string.IsNullOrEmpty(item) ? default : JsonConvert.DeserializeObject<T>(item));
+            return result;
+        }
+
+        public long InsertBefore(string key, string pivot, string value) => CSRedisCore.LInsertBefore(key, pivot, value);
+
+        public async Task<long> InsertBeforeAsync(string key, string pivot, string value) => await CSRedisCore.LInsertBeforeAsync(key, pivot, value);
+
+        public long InsertBefore<T>(string key, string pivot, T value) where T : class => InsertBefore(key, pivot, JsonConvert.SerializeObject(value));
+
+        public async Task<long> InsertBeforeAsync<T>(string key, string pivot, T value) where T : class => await InsertBeforeAsync(key, pivot, JsonConvert.SerializeObject(value));
+
+        public long InsertAfter(string key, string pivot, string value) => CSRedisCore.LInsertAfter(key, pivot, value);
+
+        public async Task<long> InsertAfterAsync(string key, string pivot, string value) => await CSRedisCore.LInsertAfterAsync(key, pivot, value);
+
+        public long InsertAfter<T>(string key, string pivot, T value) where T : class => InsertAfter(key, pivot, JsonConvert.SerializeObject(value));
+
+        public async Task<long> InsertAfterAsync<T>(string key, string pivot, T value) where T : class => await InsertAfterAsync(key, pivot, JsonConvert.SerializeObject(value));
+
+        public bool SetByIndex(string key, long index, string value) => CSRedisCore.LSet(key, index, value);
+
+        public async Task<bool> SetByIndexAsync(string key, long index, string value) => await CSRedisCore.LSetAsync(key, index, value);
+
+        public bool SetByIndex<T>(string key, long index, T value) where T : class => SetByIndex(key, index, JsonConvert.SerializeObject(value));
+
+        public async Task<bool> SetByIndexAsync<T>(string key, long index, T value) where T : class => await SetByIndexAsync(key, index, JsonConvert.SerializeObject(value));
+
+        public long Length(string key) => CSRedisCore.LLen(key);
+
+        public async Task<long> LengthAsync(string key) => await CSRedisCore.LLenAsync(key);
+
+        public long Remove(string key, long count, string value) => CSRedisCore.LRem(key, count, value);
+
+        public async Task<long> RemoveAsync(string key, long count, string value) => await CSRedisCore.LRemAsync(key, count, value);
+
+        public bool Trim(string key, long start, long stop) => CSRedisCore.LTrim(key, start, stop);
+
+        public async Task<bool> TrimAsync(string key, long start, long stop) => await CSRedisCore.LTrimAsync(key, start, stop);
+
+        public string PopLastPushFirst(string sourceKey, string targetKey) => CSRedisCore.RPopLPush(sourceKey, targetKey);
+
+        public async Task<string> PopLastPushFirstAsync(string sourceKey, string targetKey) => await CSRedisCore.RPopLPushAsync(sourceKey, targetKey);
     }
 }

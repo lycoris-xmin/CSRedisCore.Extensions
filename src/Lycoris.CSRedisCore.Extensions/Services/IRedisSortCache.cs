@@ -305,16 +305,106 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <summary>
         /// 返回指定成员的分数值
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="member"></param>
-        /// <returns></returns>
         Task<decimal?> GetScoreAsync(string key, string member);
 
         /// <summary>
-        /// 
+        /// 获取有序集合的所有成员及分数
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
         Task<Dictionary<string, decimal>> GetAllAsync(string key);
+
+        /// <summary>
+        /// 获取有序集合的所有成员及分数
+        /// </summary>
+        Dictionary<string, decimal> GetAll(string key);
+
+        /// <summary>
+        /// 统计分数区间内的成员数量
+        /// </summary>
+        long CountByScore(string key, decimal min, decimal max);
+
+        /// <summary>
+        /// 统计分数区间内的成员数量
+        /// </summary>
+        Task<long> CountByScoreAsync(string key, decimal min, decimal max);
+
+        /// <summary>
+        /// 同时向有序集合添加多个成员
+        /// </summary>
+        long SetMultiple(string key, params (decimal, string)[] members);
+
+        /// <summary>
+        /// 同时向有序集合添加多个成员
+        /// </summary>
+        Task<long> SetMultipleAsync(string key, params (decimal, string)[] members);
+
+        /// <summary>
+        /// 按排名区间返回成员（升序）
+        /// </summary>
+        string[] GetRangeByRank(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员（升序）
+        /// </summary>
+        Task<string[]> GetRangeByRankAsync(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员及分数（升序）
+        /// </summary>
+        Dictionary<string, decimal> GetRangeByRankWithScores(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员及分数（升序）
+        /// </summary>
+        Task<Dictionary<string, decimal>> GetRangeByRankWithScoresAsync(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员（降序）
+        /// </summary>
+        string[] GetRevRangeByRank(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员（降序）
+        /// </summary>
+        Task<string[]> GetRevRangeByRankAsync(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员及分数（降序）
+        /// </summary>
+        Dictionary<string, decimal> GetRevRangeByRankWithScores(string key, long start, long stop);
+
+        /// <summary>
+        /// 按排名区间返回成员及分数（降序）
+        /// </summary>
+        Task<Dictionary<string, decimal>> GetRevRangeByRankWithScoresAsync(string key, long start, long stop);
+
+        /// <summary>
+        /// 移除指定分数区间的所有成员
+        /// </summary>
+        long RemoveByScore(string key, decimal min, decimal max);
+
+        /// <summary>
+        /// 移除指定分数区间的所有成员
+        /// </summary>
+        Task<long> RemoveByScoreAsync(string key, decimal min, decimal max);
+
+        /// <summary>
+        /// 返回指定成员升序排名（分数从小到大）
+        /// </summary>
+        long? RankAscending(string key, string member);
+
+        /// <summary>
+        /// 返回指定成员升序排名（分数从小到大）
+        /// </summary>
+        Task<long?> RankAscendingAsync(string key, string member);
+
+        /// <summary>
+        /// 迭代遍历有序集合成员
+        /// </summary>
+        Models.RedisScanResult<Dictionary<string, decimal>> Scan(string key, long cursor, string pattern = null, long? count = null);
+
+        /// <summary>
+        /// 迭代遍历有序集合成员
+        /// </summary>
+        Task<Models.RedisScanResult<Dictionary<string, decimal>>> ScanAsync(string key, long cursor, string pattern = null, long? count = null);
     }
 }

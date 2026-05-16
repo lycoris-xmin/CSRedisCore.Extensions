@@ -235,5 +235,75 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="timeSpan">过期时间</param>
         /// <returns></returns>
         Task<long> SubtractionAsync(string key, long value = 1, TimeSpan? timeSpan = null);
+
+        /// <summary>
+        /// 仅当 key 已存在时才设置值
+        /// </summary>
+        bool SetIfExists(string key, string value, TimeSpan? expire = null);
+
+        /// <summary>
+        /// 仅当 key 已存在时才设置值
+        /// </summary>
+        Task<bool> SetIfExistsAsync(string key, string value, TimeSpan? expire = null);
+
+        /// <summary>
+        /// 仅当 key 已存在时才设置值
+        /// </summary>
+        bool SetIfExists<T>(string key, T value, TimeSpan? expire = null) where T : class;
+
+        /// <summary>
+        /// 仅当 key 已存在时才设置值
+        /// </summary>
+        Task<bool> SetIfExistsAsync<T>(string key, T value, TimeSpan? expire = null) where T : class;
+
+        /// <summary>
+        /// 获取字符串值的长度
+        /// </summary>
+        long StringLength(string key);
+
+        /// <summary>
+        /// 获取字符串值的长度
+        /// </summary>
+        Task<long> StringLengthAsync(string key);
+
+        /// <summary>
+        /// 追加内容到已有字符串末尾，返回新长度
+        /// </summary>
+        long Append(string key, string value);
+
+        /// <summary>
+        /// 追加内容到已有字符串末尾，返回新长度
+        /// </summary>
+        Task<long> AppendAsync(string key, string value);
+
+        /// <summary>
+        /// 获取子字符串
+        /// </summary>
+        string GetRange(string key, long start, long end);
+
+        /// <summary>
+        /// 获取子字符串
+        /// </summary>
+        Task<string> GetRangeAsync(string key, long start, long end);
+
+        /// <summary>
+        /// 覆盖指定偏移位置的子字符串，返回新长度
+        /// </summary>
+        long SetRange(string key, uint offset, string value);
+
+        /// <summary>
+        /// 覆盖指定偏移位置的子字符串，返回新长度
+        /// </summary>
+        Task<long> SetRangeAsync(string key, uint offset, string value);
+
+        /// <summary>
+        /// 设置指定 key 的值（同步版本）
+        /// </summary>
+        bool SetIfNotExists(string key, string value, TimeSpan? expire = null);
+
+        /// <summary>
+        /// 设置指定 key 的值（同步版本）
+        /// </summary>
+        bool SetIfNotExists<T>(string key, T value, TimeSpan? expire = null) where T : class;
     }
 }

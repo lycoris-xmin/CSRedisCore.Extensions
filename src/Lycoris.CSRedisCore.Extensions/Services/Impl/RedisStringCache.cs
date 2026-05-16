@@ -603,5 +603,81 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
             return cache;
         }
+
+        public bool SetIfExists(string key, string value, TimeSpan? expire = null)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
+
+            var seconds = expire.HasValue ? (int)expire.Value.TotalSeconds : 30;
+            if (expire != null)
+                return CSRedisCore.Set(key, value, seconds, RedisExistence.Xx);
+            else
+                return CSRedisCore.Set(key, value, 30, RedisExistence.Xx);
+        }
+
+        public async Task<bool> SetIfExistsAsync(string key, string value, TimeSpan? expire = null)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
+
+            var seconds = expire.HasValue ? (int)expire.Value.TotalSeconds : 30;
+            if (expire != null)
+                return await CSRedisCore.SetAsync(key, value, seconds, RedisExistence.Xx);
+            else
+                return await CSRedisCore.SetAsync(key, value, 30, RedisExistence.Xx);
+        }
+
+        public bool SetIfExists<T>(string key, T value, TimeSpan? expire = null) where T : class
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            return SetIfExists(key, JsonConvert.SerializeObject(value, JsonSetting), expire);
+        }
+
+        public async Task<bool> SetIfExistsAsync<T>(string key, T value, TimeSpan? expire = null) where T : class
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            return await SetIfExistsAsync(key, JsonConvert.SerializeObject(value, JsonSetting), expire);
+        }
+
+        public long StringLength(string key) => CSRedisCore.StrLen(key);
+
+        public async Task<long> StringLengthAsync(string key) => await CSRedisCore.StrLenAsync(key);
+
+        public long Append(string key, string value) => CSRedisCore.Append(key, value);
+
+        public async Task<long> AppendAsync(string key, string value) => await CSRedisCore.AppendAsync(key, value);
+
+        public string GetRange(string key, long start, long end) => CSRedisCore.GetRange(key, start, end);
+
+        public async Task<string> GetRangeAsync(string key, long start, long end) => await CSRedisCore.GetRangeAsync(key, start, end);
+
+        public long SetRange(string key, uint offset, string value) => CSRedisCore.SetRange(key, offset, value);
+
+        public async Task<long> SetRangeAsync(string key, uint offset, string value) => await CSRedisCore.SetRangeAsync(key, offset, value);
+
+        public bool SetIfNotExists(string key, string value, TimeSpan? expire = null)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
+
+            var result = CSRedisCore.SetNx(key, value);
+            if (result && expire != null)
+                CSRedisCore.Expire(key, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
+
+            return result;
+        }
+
+        public bool SetIfNotExists<T>(string key, T value, TimeSpan? expire = null) where T : class
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
+
+            var result = CSRedisCore.SetNx(key, JsonConvert.SerializeObject(value, JsonSetting));
+            if (result && expire != null)
+                CSRedisCore.Expire(key, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
+
+            return result;
+        }
     }
 }
