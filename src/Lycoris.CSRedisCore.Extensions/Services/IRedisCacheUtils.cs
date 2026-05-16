@@ -295,5 +295,21 @@ namespace Lycoris.CSRedisCore.Extensions.Services
         /// <param name="func"></param>
         /// <returns></returns>
         Task<object[]> PipeExecuteAsync(Func<CSRedisClientPipe<string>, Task> func);
+
+        /// <summary>
+        /// 使用类型化管道上下文执行 Redis 事务。
+        /// 回调内通过 cache.String/cache.Hash 等排队命令，单次操作不可使用 await。
+        /// </summary>
+        /// <param name="action">同步事务操作委托</param>
+        /// <returns>事务命令返回结果数组</returns>
+        object[] PipeExecute(Action<Pipe.RedisCachePipe> action);
+
+        /// <summary>
+        /// 使用类型化管道上下文异步执行 Redis 事务。
+        /// 回调内通过 cache.String/cache.Hash 等排队命令，单次操作不可使用 await。
+        /// </summary>
+        /// <param name="func">异步事务操作委托</param>
+        /// <returns>事务命令返回结果数组</returns>
+        Task<object[]> PipeExecuteAsync(Func<Pipe.RedisCachePipe, Task> func);
     }
 }

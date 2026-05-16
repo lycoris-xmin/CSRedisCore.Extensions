@@ -1,5 +1,6 @@
 ﻿using CSRedis;
 using Lycoris.CSRedisCore.Extensions.Options;
+using Lycoris.CSRedisCore.Extensions.Services.Pipe;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -720,6 +721,56 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                     return pipe.EndPipe();
                 }
                 catch
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 使用类型化管道上下文执行 Redis 事务
+        /// </summary>
+        public object[] PipeExecute(Action<RedisCachePipe> action)
+        {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            using (var pipe = CSRedisCore.StartPipe())
+            {
+                try
+                {
+                    var ctx = new RedisCachePipe(pipe, JsonSetting, PrefixCacheKey);
+                    action.Invoke(ctx);
+                    var results = pipe.EndPipe();
+                    ctx.DistributeResults(results);
+                    return results;
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 使用类型化管道上下文异步执行 Redis 事务
+        /// </summary>
+        public async Task<object[]> PipeExecuteAsync(Func<RedisCachePipe, Task> func)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            using (var pipe = CSRedisCore.StartPipe())
+            {
+                try
+                {
+                    var ctx = new RedisCachePipe(pipe, JsonSetting, PrefixCacheKey);
+                    await func.Invoke(ctx);
+                    var results = pipe.EndPipe();
+                    ctx.DistributeResults(results);
+                    return results;
+                }
+                catch (Exception ex)
                 {
                     throw;
                 }

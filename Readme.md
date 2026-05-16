@@ -15,7 +15,7 @@
 - **发布/订阅** — 普通订阅 & 模式订阅（通配符），集群兼容
 - **有序集合增强** — 按分数范围查询、排名、弹出最高/最低分成员
 - **Redis 监控** — 解析 INFO 命令，返回结构化 Server / Memory / CPU / Stats / Keyspace 信息
-- **事务 & 管道** — 支持事务操作、Lua 脚本执行
+- **事务 & 管道** — 类型化管道 API（与 RedisCache 一致的调用风格），支持批量操作、Lua 脚本执行
 - **缓存穿透保护** — `CacheShell` 空值缓存
 - **Key 前缀** — 自动为所有 Key 添加统一前缀，便于多项目共用
 - **哨兵模式** — 支持 Redis Sentinel 高可用部署
@@ -325,7 +325,17 @@ Console.WriteLine($"CPU 负载: {info.Cpu.LoadDescription}");
 ### 事务 & Lua 脚本 `RedisCache.Utils`
 
 ```csharp
-// 管道事务
+// 类型化管道事务（推荐）— API 风格与 RedisCache 一致
+var results = await RedisCache.Utils.PipeExecuteAsync(cache =>
+{
+    cache.String.SetAsync("k1", "v1");
+    cache.String.AdditionAsync("counter", 1);
+    cache.Hash.SetAsync("h1", "f1", "v1");
+    return Task.CompletedTask;
+});
+// 注意：回调内不可 await 单个操作，所有命令排队后在回调返回时批量执行
+
+// 原始管道事务（兼容旧版）
 var results = await RedisCache.Utils.PipeExecuteAsync(async pipe =>
 {
     await pipe.SetAsync("k1", "v1");
