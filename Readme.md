@@ -82,12 +82,13 @@ await session.String.SetAsync("token", "xxx");
 await RedisCache.String.SetAsync("key", "value", TimeSpan.FromMinutes(5));
 await RedisCache.String.SetAsync("user", userObj);
 
+// 仅当 key 不存在/已存在时才设置
+await RedisCache.String.SetIfNotExistsAsync("lock", "1", TimeSpan.FromSeconds(30));
+await RedisCache.String.SetIfExistsAsync("key", "newvalue");
+
 // 读取
 string val = await RedisCache.String.GetAsync("key");
 User user = await RedisCache.String.GetAsync<User>("user");
-
-// 不存在才写入
-await RedisCache.String.SetIfNotExistsAsync("lock", "1", TimeSpan.FromSeconds(30));
 
 // 批量操作
 await RedisCache.String.MultipleSetAsync("k1", "v1", "k2", "v2");
@@ -99,6 +100,12 @@ List<User> allUsers = await RedisCache.String.MultipleGetAsync<User>("user");
 // 原子增减
 long count = await RedisCache.String.AdditionAsync("counter", 1);
 long remain = await RedisCache.String.SubtractionAsync("stock", 5);
+
+// 字符串操作
+long len = await RedisCache.String.StringLengthAsync("key");
+long newLen = await RedisCache.String.AppendAsync("key", "-suffix");
+string sub = await RedisCache.String.GetRangeAsync("key", 0, 10);
+await RedisCache.String.SetRangeAsync("key", 5, "replace");
 ```
 
 ### Hash 操作 `RedisCache.Hash`
