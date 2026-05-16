@@ -124,8 +124,16 @@ Dictionary<string, string> all = await RedisCache.Hash.GetAllAsync("user:1");
 // 仅当字段不存在才设置
 await RedisCache.Hash.SetNxAsync("user:1", "role", "admin");
 
-// 字段增减
+// 字段增减（整数/浮点）
 await RedisCache.Hash.AdditionAsync("user:1", "score", 10);
+await RedisCache.Hash.IncrByFloatAsync("user:1", "balance", 1.5m);
+
+// 获取所有值 / 字段值长度
+List<string> values = await RedisCache.Hash.ValuesAsync("user:1");
+long len = await RedisCache.Hash.FieldStringLengthAsync("user:1", "name");
+
+// 迭代大型 Hash
+var scan = await RedisCache.Hash.ScanAsync("user:1", 0, count: 100);
 ```
 
 ### List 操作 `RedisCache.List`
@@ -138,33 +146,93 @@ await RedisCache.List.SetLastAsync("queue", "item2");
 // 弹出
 string first = await RedisCache.List.GetAndRemoveFirstAsync("queue");
 string last = await RedisCache.List.GetAndRemoveLastAsync("queue");
+
+// 获取全部 / 区间元素
+List<string> all = await RedisCache.List.GetAllAsync("queue");
+List<string> range = await RedisCache.List.GetRangeAsync("queue", 0, 9);
+
+// 按索引操作
+string item = await RedisCache.List.GetByIndexAsync("queue", 3);
+await RedisCache.List.SetByIndexAsync("queue", 3, "newvalue");
+
+// 插入（在指定元素前/后）
+await RedisCache.List.InsertBeforeAsync("queue", "pivot", "newitem");
+await RedisCache.List.InsertAfterAsync("queue", "pivot", "newitem");
+
+// 列表信息
+long len = await RedisCache.List.LengthAsync("queue");
+
+// 移除与裁剪
+long removed = await RedisCache.List.RemoveAsync("queue", 0, "item1"); // 移除所有匹配
+await RedisCache.List.TrimAsync("queue", 0, 99); // 保留前100个
+
+// 转移元素
+string moved = await RedisCache.List.PopLastPushFirstAsync("source", "target");
 ```
 
 ### Set 操作 `RedisCache.Set`
 
 ```csharp
+// 添加 / 移除
 await RedisCache.Set.SetAsync("tags", "redis", "csharp", "dotnet");
+await RedisCache.Set.RemoveAsync("tags", "csharp");
+
+// 查询
 long count = await RedisCache.Set.CountAsync("tags");
 bool exists = await RedisCache.Set.ExistsAsync("tags", "redis");
-string random = await RedisCache.Set.GetRandomAsync("tags");
+List<string> all = await RedisCache.Set.GetAllAsync("tags");
+
+// 随机获取（不移除）
+string r = await RedisCache.Set.RandomMemberAsync("tags");
+string[] rs = await RedisCache.Set.RandomMembersAsync("tags", 3);
+
+// 随机弹出（移除）
+string popped = await RedisCache.Set.GetRandomAsync("tags");
+
+// 移动成员
+await RedisCache.Set.MoveAsync("tags", "archive", "redis");
+
+// 集合运算
+string[] diff = await RedisCache.Set.DifferenceAsync("a", "b");   // 差集
+string[] inter = await RedisCache.Set.IntersectionAsync("a", "b"); // 交集
+string[] union = await RedisCache.Set.UnionAsync("a", "b");       // 并集
+await RedisCache.Set.IntersectionStoreAsync("dest", "a", "b");   // 交集存储到新集合
+
+// 迭代大型集合
+var scan = await RedisCache.Set.ScanAsync("tags", 0, count: 100);
 ```
 
 ### Sorted Set 操作 `RedisCache.Sort`
 
 ```csharp
-// 添加
+// 添加（单个/批量）
 await RedisCache.Sort.AddAsync("leaderboard", "player1", 100);
+await RedisCache.Sort.SetMultipleAsync("leaderboard", (200, "p2"), (300, "p3"));
 
 // 按分数范围查询
 var top10 = await RedisCache.Sort.GetRevRangeByScoreWithScoresAsync("leaderboard", 1000, 0, count: 10);
 
-// 排名 & 分数
-long? rank = await RedisCache.Sort.RankAsync("leaderboard", "player1");
+// 按排名查询（升序/降序）
+var rankRange = await RedisCache.Sort.GetRangeByRankWithScoresAsync("leaderboard", 0, 9);
+var revRankRange = await RedisCache.Sort.GetRevRangeByRankWithScoresAsync("leaderboard", 0, 9);
+
+// 排名 & 分数（降序/升序）
+long? rank = await RedisCache.Sort.RankAsync("leaderboard", "player1");          // 降序
+long? rankAsc = await RedisCache.Sort.RankAscendingAsync("leaderboard", "player1"); // 升序
 decimal? score = await RedisCache.Sort.GetScoreAsync("leaderboard", "player1");
+
+// 统计分数区间
+long cnt = await RedisCache.Sort.CountByScoreAsync("leaderboard", 100, 500);
 
 // 弹出最高分 / 最低分成员
 string[] max = await RedisCache.Sort.MaxAsync("leaderboard", 3);
 string[] min = await RedisCache.Sort.MinAsync("leaderboard", 3);
+
+// 按分数区间移除
+await RedisCache.Sort.RemoveByScoreAsync("leaderboard", 0, 50);
+
+// 迭代大型有序集合
+var scan = await RedisCache.Sort.ScanAsync("leaderboard", 0, count: 100);
 ```
 
 ### 分布式锁 `RedisCache.Utils`
@@ -209,11 +277,20 @@ bool exists = await RedisCache.Utils.CheckValueExitsFromQueueAsync("tasks", targ
 ```csharp
 bool exists = await RedisCache.Key.ExistsAsync("key");
 await RedisCache.Key.ExpireAsync("key", TimeSpan.FromMinutes(30));
-long ttl = await RedisCache.Key.TTLAsync("key");
+await RedisCache.Key.ExpireAtAsync("key", DateTime.Now.AddHours(1)); // Unix 时间戳过期
+long ttl = await RedisCache.Key.TTLAsync("key");      // 秒
+long pttl = await RedisCache.Key.PTTLAsync("key");     // 毫秒
+await RedisCache.Key.PExpireAsync("key", 5000);         // 毫秒过期
+await RedisCache.Key.PersistAsync("key");               // 移除过期时间
 await RedisCache.Key.RenameAsync("old", "new");
 await RedisCache.Key.RemoveAsync("key1", "key2");
 string[] keys = await RedisCache.Key.GetKeysAsync("user:*");
+var type = await RedisCache.Key.TypeAsync("key");       // KeyType 枚举
+var random = await RedisCache.Key.RandomKeyAsync();
 var allKeys = await RedisCache.Key.GetAllRedisKeysInfoAsync(); // 全量 key 列表 + 类型 + TTL
+
+// 游标迭代（安全遍历大量 key）
+var scan = await RedisCache.Key.ScanAsync(0, "user:*", count: 100);
 ```
 
 ### 发布/订阅 `RedisCache.Message`
