@@ -4,7 +4,7 @@
     <LangVersion>8.0</LangVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Title>Lycoris.CSRedisCore.Extensions</Title>
-    <Version>8.1.0</Version>
+    <Version>8.2.0</Version>
     <Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
     <Authors>Lycoris</Authors>
     <RepositoryUrl>https://github.com/lycoris-xmin/CSRedisCore.Extensions</RepositoryUrl>
