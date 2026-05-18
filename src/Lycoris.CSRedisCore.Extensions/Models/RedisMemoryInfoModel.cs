@@ -1,7 +1,7 @@
 ﻿namespace Lycoris.CSRedisCore.Extensions.Models
 {
     /// <summary>
-    /// 
+    /// Redis 内存使用信息
     /// </summary>
     public class RedisMemoryInfoModel
     {
@@ -26,12 +26,12 @@
         public long MaxMemory { get; set; }
 
         /// <summary>
-        /// 
+        /// 最大内存（人类可读格式）
         /// </summary>
         public string MaxMemoryHuman { get; set; }
 
         /// <summary>
-        /// 
+        /// 内存负载描述
         /// </summary>
         public string LoadDescription
         {

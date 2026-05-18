@@ -1,7 +1,7 @@
 ﻿namespace Lycoris.CSRedisCore.Extensions.Models
 {
     /// <summary>
-    /// 
+    /// Redis 客户端连接信息
     /// </summary>
     public class RedisClientsInfoModel
     {

@@ -1,7 +1,7 @@
 ﻿namespace Lycoris.CSRedisCore.Extensions.Models
 {
     /// <summary>
-    /// 
+    /// Redis 键空间统计信息
     /// </summary>
     public class RedisKeyspaceInfoModel
     {

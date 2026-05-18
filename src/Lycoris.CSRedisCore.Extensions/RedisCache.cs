@@ -5,7 +5,7 @@ using Lycoris.CSRedisCore.Extensions.Services.Impl;
 namespace Lycoris.CSRedisCore.Extensions
 {
     /// <summary>
-    /// 
+    /// Redis 缓存静态入口，提供 String/Hash/List/Set/Sort/Key/Message/Utils/Monitor 等操作的便捷访问
     /// </summary>
     public static class RedisCache
     {
@@ -156,7 +156,7 @@ namespace Lycoris.CSRedisCore.Extensions
 
         private static IMonitorService _Monitor = null;
         /// <summary>
-        /// 
+        /// 监控服务
         /// </summary>
         public static IMonitorService Monitor
         {

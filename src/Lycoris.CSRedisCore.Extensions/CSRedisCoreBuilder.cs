@@ -1,4 +1,4 @@
-﻿using CSRedis;
+using CSRedis;
 using Lycoris.CSRedisCore.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -7,14 +7,14 @@ using System.Collections.Generic;
 namespace Lycoris.CSRedisCore.Extensions
 {
     /// <summary>
-    /// 
+    /// Redis 客户端构建器，用于注册单实例或多实例 Redis 连接
     /// </summary>
     public class CSRedisCoreBuilder
     {
         /// <summary>
-        /// 
+        /// 注册单个 Redis 实例，配置连接到 RedisCache.Client 静态入口
         /// </summary>
-        /// <param name="configure"></param>
+        /// <param name="configure">Redis 配置委托</param>
         public static void AddSingleRedisInstance(Action<RedisConiguration> configure)
         {
             var configuretaion = new RedisConiguration();
@@ -25,10 +25,10 @@ namespace Lycoris.CSRedisCore.Extensions
         }
 
         /// <summary>
-        /// 
+        /// 注册多个 Redis 实例，通过 RedisCacheFactory.GetInstance(instanceName) 获取对应实例
         /// </summary>
-        /// <param name="instanceName"></param>
-        /// <param name="configure"></param>
+        /// <param name="instanceName">实例名称，用于后续获取实例</param>
+        /// <param name="configure">Redis 配置委托</param>
         public static void AddMultipleRedisInstance(string instanceName, Action<RedisConiguration> configure)
         {
             var configuretaion = new RedisConiguration();

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 {
     /// <summary>
-    /// 
+    /// Redis 工具类实现，提供分布式锁、队列操作、Lua 脚本执行、管道事务、Redis 信息查询等功能
     /// </summary>
     public class RedisCacheUtils : IRedisCacheUtils
     {
@@ -19,11 +19,11 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         private readonly string PrefixCacheKey = "";
 
         /// <summary>
-        /// 
+        /// 初始化 RedisCacheUtils 实例
         /// </summary>
-        /// <param name="CSRedisCore"></param>
-        /// <param name="JsonSetting"></param>
-        /// <param name="prefixCacheKey"></param>
+        /// <param name="CSRedisCore">CSRedis 客户端实例</param>
+        /// <param name="JsonSetting">JSON 序列化配置</param>
+        /// <param name="prefixCacheKey">缓存键前缀</param>
         public RedisCacheUtils(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting, string prefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
@@ -652,10 +652,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         public async Task KillLuaScriptAsync() => await CSRedisCore.ScriptKillAsync();
 
         /// <summary>
-        /// 
+        /// 获取 Redis 服务器的各项信息和统计数值
         /// </summary>
-        /// <param name="section"></param>
-        /// <returns></returns>
+        /// <param name="section">信息段（可选）</param>
+        /// <returns>各节点信息列表</returns>
         public List<(string node, string value)> RedisInfo(InfoSection? section = null)
         {
             var result = CSRedisCore.NodesServerManager.Info(section);
@@ -663,10 +663,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         }
 
         /// <summary>
-        /// 
+        /// 获取 Redis 服务器的各项信息和统计数值
         /// </summary>
-        /// <param name="section"></param>
-        /// <returns></returns>
+        /// <param name="section">信息段（可选）</param>
+        /// <returns>各节点信息列表</returns>
         public async Task<List<(string node, string value)>> RedisInfoAsync(InfoSection? section = null)
         {
             var result = await CSRedisCore.NodesServerManager.InfoAsync(section);

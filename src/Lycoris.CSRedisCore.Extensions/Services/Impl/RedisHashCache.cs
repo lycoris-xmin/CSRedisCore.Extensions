@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 {
     /// <summary>
-    /// 
+    /// Redis Hash 缓存操作实现，提供哈希表的字段增删改查、批量操作、原子增减等功能
     /// </summary>
     public sealed class RedisHashCache : IRedisHashCache
     {
@@ -17,11 +17,11 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         private readonly string PrefixCacheKey;
 
         /// <summary>
-        /// 
+        /// 初始化 RedisHashCache 实例
         /// </summary>
-        /// <param name="CSRedisCore"></param>
-        /// <param name="JsonSetting"></param>
-        /// <param name="prefixCacheKey"></param>
+        /// <param name="CSRedisCore">CSRedis 客户端实例</param>
+        /// <param name="JsonSetting">JSON 序列化配置</param>
+        /// <param name="prefixCacheKey">缓存键前缀</param>
         public RedisHashCache(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting, string prefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
@@ -479,18 +479,62 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return value;
         }
 
+        /// <summary>
+        /// 为哈希表 key 中的指定字段的浮点数值加上增量
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="fieId">字段名</param>
+        /// <param name="value">增量值</param>
+        /// <returns>增加后的值</returns>
         public decimal IncrByFloat(string key, string fieId, decimal value) => CSRedisCore.HIncrByFloat(key, fieId, value);
 
+        /// <summary>
+        /// 为哈希表 key 中的指定字段的浮点数值加上增量
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="fieId">字段名</param>
+        /// <param name="value">增量值</param>
+        /// <returns>增加后的值</returns>
         public async Task<decimal> IncrByFloatAsync(string key, string fieId, decimal value) => await CSRedisCore.HIncrByFloatAsync(key, fieId, value);
 
+        /// <summary>
+        /// 获取哈希表中所有字段的值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>哈希表中所有值的列表</returns>
         public List<string> Values(string key) => CSRedisCore.HVals(key)?.ToList() ?? new List<string>();
 
+        /// <summary>
+        /// 获取哈希表中所有字段的值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>哈希表中所有值的列表</returns>
         public async Task<List<string>> ValuesAsync(string key) => (await CSRedisCore.HValsAsync(key))?.ToList() ?? new List<string>();
 
+        /// <summary>
+        /// 获取哈希表指定字段值的字符串长度
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="fieId">字段名</param>
+        /// <returns>字段值的字符串长度</returns>
         public long FieldStringLength(string key, string fieId) => CSRedisCore.HStrLen(key, fieId);
 
+        /// <summary>
+        /// 获取哈希表指定字段值的字符串长度
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="fieId">字段名</param>
+        /// <returns>字段值的字符串长度</returns>
         public async Task<long> FieldStringLengthAsync(string key, string fieId) => await CSRedisCore.HStrLenAsync(key, fieId);
 
+        /// <summary>
+        /// 迭代哈希表中的键值对
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="cursor">游标</param>
+        /// <param name="pattern">匹配模式</param>
+        /// <param name="count">每次迭代返回的数量</param>
+        /// <returns>扫描结果，包含游标和键值对集合</returns>
         public Models.RedisScanResult<Dictionary<string, string>> Scan(string key, long cursor, string pattern = null, long? count = null)
         {
             var result = CSRedisCore.HScan(key, cursor, pattern, count ?? 100);
@@ -500,6 +544,14 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return new Models.RedisScanResult<Dictionary<string, string>> { Cursor = result.Cursor, Items = dic };
         }
 
+        /// <summary>
+        /// 迭代哈希表中的键值对
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="cursor">游标</param>
+        /// <param name="pattern">匹配模式</param>
+        /// <param name="count">每次迭代返回的数量</param>
+        /// <returns>扫描结果，包含游标和键值对集合</returns>
         public async Task<Models.RedisScanResult<Dictionary<string, string>>> ScanAsync(string key, long cursor, string pattern = null, long? count = null)
         {
             var result = await CSRedisCore.HScanAsync(key, cursor, pattern, count ?? 100);

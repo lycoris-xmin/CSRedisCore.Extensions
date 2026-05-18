@@ -1,4 +1,4 @@
-﻿using CSRedis;
+using CSRedis;
 using Lycoris.CSRedisCore.Extensions.Services;
 using Lycoris.CSRedisCore.Extensions.Services.Impl;
 using Newtonsoft.Json;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Lycoris.CSRedisCore.Extensions
 {
     /// <summary>
-    /// 
+    /// Redis 缓存服务实例，封装 String/Hash/List/Set/Sort/Key/Message/Utils/Monitor 等操作
     /// </summary>
     public sealed class RedisCacheService
     {
@@ -23,16 +23,16 @@ namespace Lycoris.CSRedisCore.Extensions
         private readonly JsonSerializerSettings JsonSetting;
 
         /// <summary>
-        /// 
+        /// 缓存键前缀
         /// </summary>
         private string PrefixCacheKey = "";
 
         /// <summary>
-        /// 
+        /// 初始化 Redis 缓存服务实例
         /// </summary>
-        /// <param name="Command"></param>
-        /// <param name="JsonSerializerSetting"></param>
-        /// <param name="prefixCackeKey"></param>
+        /// <param name="Command">Redis 客户端</param>
+        /// <param name="JsonSerializerSetting">JSON 序列化设置</param>
+        /// <param name="prefixCackeKey">缓存键前缀</param>
         public RedisCacheService(CSRedisClient Command, JsonSerializerSettings JsonSerializerSetting, string prefixCackeKey)
         {
             this.Command = Command;
@@ -178,7 +178,7 @@ namespace Lycoris.CSRedisCore.Extensions
 
         private IMonitorService _Monitor = null;
         /// <summary>
-        /// 
+        /// 监控服务
         /// </summary>
         public IMonitorService Monitor
         {
@@ -193,12 +193,12 @@ namespace Lycoris.CSRedisCore.Extensions
         }
 
         /// <summary>
-        /// 
+        /// 缓存穿透保护，在缓存不存在时执行指定函数获取数据并自动缓存
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">缓存键</param>
         /// <param name="span">超时时间</param>
-        /// <param name="func"></param>
-        /// <returns></returns>
+        /// <param name="func">获取数据的异步函数</param>
+        /// <returns>缓存值或函数返回的数据</returns>
         public async Task<string> CacheShell(string key, TimeSpan span, Func<Task<string>> func) => await Command.CacheShellAsync(key, (int)span.TotalSeconds, func);
 
         /// <summary>

@@ -4,7 +4,7 @@ using System.Text;
 namespace Lycoris.CSRedisCore.Extensions.Options
 {
     /// <summary>
-    /// 
+    /// Redis 连接配置
     /// </summary>
     public class RedisConiguration
     {
@@ -115,9 +115,9 @@ namespace Lycoris.CSRedisCore.Extensions.Options
         internal bool HasSentinels { get => Sentinels != null && Sentinels.Length > 0; }
 
         /// <summary>
-        /// 
+        /// 返回 Redis 连接字符串
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Redis 连接字符串</returns>
         public override string ToString()
         {
             var sb = new StringBuilder();

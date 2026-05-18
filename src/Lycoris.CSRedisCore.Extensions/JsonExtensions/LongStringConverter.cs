@@ -34,7 +34,7 @@ namespace Lycoris.CSRedisCore.Extensions.JsonExtensions
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => existingValue ?? 0L;
 
         /// <summary>
-        /// 
+        /// 是否支持反序列化读取
         /// </summary>
         public override bool CanRead => false;
     }

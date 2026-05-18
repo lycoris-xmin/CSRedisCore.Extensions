@@ -6,7 +6,7 @@ using static CSRedis.CSRedisClient;
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 {
     /// <summary>
-    /// 
+    /// Redis 发布订阅消息操作实现，提供消息发布、订阅（精确/模糊/泛型）等功能
     /// </summary>
     public class RedisEventMessage : IRedisEventMessage
     {
@@ -14,10 +14,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         private readonly JsonSerializerSettings JsonSetting;
 
         /// <summary>
-        /// 
+        /// 初始化 RedisEventMessage 实例
         /// </summary>
-        /// <param name="CSRedisCore"></param>
-        /// <param name="JsonSetting"></param>
+        /// <param name="CSRedisCore">CSRedis 客户端实例</param>
+        /// <param name="JsonSetting">JSON 序列化配置</param>
         public RedisEventMessage(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting)
         {
             this.CSRedisCore = CSRedisCore;

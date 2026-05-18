@@ -12,7 +12,6 @@ namespace Lycoris.CSRedisCore.Extensions
         /// </summary>
         internal static JsonSerializerSettings Settings { get; private set; } = new JsonSerializerSettings()
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
             DateFormatString = "yyyy-MM-dd HH:mm:ss.ffffff",
             ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
             NullValueHandling = NullValueHandling.Ignore,

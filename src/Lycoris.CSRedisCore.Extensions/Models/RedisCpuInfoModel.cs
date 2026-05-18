@@ -1,7 +1,7 @@
 ﻿namespace Lycoris.CSRedisCore.Extensions.Models
 {
     /// <summary>
-    /// 
+    /// Redis CPU 信息
     /// </summary>
     public class RedisCpuInfoModel
     {
@@ -26,7 +26,7 @@
         public double UsedCpuUserChildren { get; set; }
 
         /// <summary>
-        /// 
+        /// CPU 负载描述
         /// </summary>
         public string LoadDescription
         {

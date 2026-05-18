@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 {
     /// <summary>
-    /// 
+    /// Redis 监控服务实现，用于获取并解析 Redis INFO 命令返回的服务器运行状态信息
     /// </summary>
     public class MonitorService : IMonitorService
     {
@@ -24,10 +24,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         private readonly JsonSerializerSettings JsonSetting;
 
         /// <summary>
-        /// 
+        /// 初始化 MonitorService 实例
         /// </summary>
-        /// <param name="cSRedisCore"></param>
-        /// <param name="jsonSetting"></param>
+        /// <param name="cSRedisCore">CSRedis 客户端实例</param>
+        /// <param name="jsonSetting">JSON 序列化配置</param>
         public MonitorService(CSRedisClient cSRedisCore, JsonSerializerSettings jsonSetting)
         {
             CSRedisCore = cSRedisCore;
@@ -36,9 +36,9 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 
 
         /// <summary>
-        /// 
+        /// 获取 Redis 服务器 INFO 信息并解析为结构化模型
         /// </summary>
-        /// <returns></returns>
+        /// <returns>包含服务器、客户端、内存、统计、CPU、键空间等信息的 <see cref="RedisInfoModel"/></returns>
         public async Task<RedisInfoModel> GetInfoAsync()
         {
             var model = new RedisInfoModel();

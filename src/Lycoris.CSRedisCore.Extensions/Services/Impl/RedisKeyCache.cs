@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 {
     /// <summary>
-    /// 
+    /// Redis Key 缓存操作实现，提供 Key 的查找、存在检查、过期管理、重命名、删除、扫描等功能
     /// </summary>
     public class RedisKeyCache : IRedisKeyCache
     {
@@ -14,10 +14,10 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         private readonly string PrefixCacheKey;
 
         /// <summary>
-        /// 
+        /// 初始化 RedisKeyCache 实例
         /// </summary>
-        /// <param name="CSRedisCore"></param>
-        /// <param name="PrefixCacheKey"></param>
+        /// <param name="CSRedisCore">CSRedis 客户端实例</param>
+        /// <param name="PrefixCacheKey">缓存键前缀</param>
         public RedisKeyCache(CSRedisClient CSRedisCore, string PrefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
@@ -266,36 +266,102 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return result;
         }
 
+        /// <summary>
+        /// 以毫秒为单位，返回给定 key 的剩余生存时间
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>剩余毫秒数</returns>
         public long PTTL(string key) => string.IsNullOrEmpty(key) ? 0 : CSRedisCore.PTtl(key);
 
+        /// <summary>
+        /// 以毫秒为单位，返回给定 key 的剩余生存时间
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>剩余毫秒数</returns>
         public async Task<long> PTTLAsync(string key) => string.IsNullOrEmpty(key) ? 0 : await CSRedisCore.PTtlAsync(key);
 
+        /// <summary>
+        /// 为给定 key 设置过期时间，以毫秒计
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="milliseconds">过期毫秒数</param>
+        /// <returns>是否设置成功</returns>
         public bool PExpire(string key, int milliseconds) => !string.IsNullOrEmpty(key) && CSRedisCore.PExpire(key, milliseconds);
 
+        /// <summary>
+        /// 为给定 key 设置过期时间，以毫秒计
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="milliseconds">过期毫秒数</param>
+        /// <returns>是否设置成功</returns>
         public async Task<bool> PExpireAsync(string key, int milliseconds) => !string.IsNullOrEmpty(key) && await CSRedisCore.PExpireAsync(key, milliseconds);
 
+        /// <summary>
+        /// 返回指定 key 所储存的值的类型
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>Key 的类型</returns>
         public KeyType Type(string key) => string.IsNullOrEmpty(key) ? KeyType.None : CSRedisCore.Type(key);
 
+        /// <summary>
+        /// 返回指定 key 所储存的值的类型
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>Key 的类型</returns>
         public async Task<KeyType> TypeAsync(string key) => string.IsNullOrEmpty(key) ? KeyType.None : await CSRedisCore.TypeAsync(key);
 
+        /// <summary>
+        /// 扫描所有 Key（基于游标的迭代器）
+        /// </summary>
+        /// <param name="cursor">游标</param>
+        /// <param name="pattern">匹配模式</param>
+        /// <param name="count">每次返回的数量</param>
+        /// <returns>扫描结果，包含游标和 Key 数组</returns>
         public Models.RedisScanResult<string[]> Scan(long cursor, string pattern = null, long? count = null)
         {
             var result = CSRedisCore.Scan(cursor, pattern ?? $"{this.PrefixCacheKey}*", count ?? 100);
             return new Models.RedisScanResult<string[]> { Cursor = result.Cursor, Items = result.Items };
         }
 
+        /// <summary>
+        /// 扫描所有 Key（基于游标的迭代器）
+        /// </summary>
+        /// <param name="cursor">游标</param>
+        /// <param name="pattern">匹配模式</param>
+        /// <param name="count">每次返回的数量</param>
+        /// <returns>扫描结果，包含游标和 Key 数组</returns>
         public async Task<Models.RedisScanResult<string[]>> ScanAsync(long cursor, string pattern = null, long? count = null)
         {
             var result = await CSRedisCore.ScanAsync(cursor, pattern ?? $"{this.PrefixCacheKey}*", count ?? 100);
             return new Models.RedisScanResult<string[]> { Cursor = result.Cursor, Items = result.Items };
         }
 
+        /// <summary>
+        /// 从当前数据库中随机返回一个 key
+        /// </summary>
+        /// <returns>随机 key</returns>
         public string RandomKey() => CSRedisCore.RandomKey();
 
+        /// <summary>
+        /// 从当前数据库中随机返回一个 key
+        /// </summary>
+        /// <returns>随机 key</returns>
         public async Task<string> RandomKeyAsync() => await CSRedisCore.RandomKeyAsync();
 
+        /// <summary>
+        /// 为给定 key 设置过期时间（指定时间戳）
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="expire">过期时间点</param>
+        /// <returns>是否设置成功</returns>
         public bool ExpireAt(string key, DateTime expire) => !string.IsNullOrEmpty(key) && CSRedisCore.ExpireAt(key, expire);
 
+        /// <summary>
+        /// 为给定 key 设置过期时间（指定时间戳）
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="expire">过期时间点</param>
+        /// <returns>是否设置成功</returns>
         public async Task<bool> ExpireAtAsync(string key, DateTime expire) => !string.IsNullOrEmpty(key) && await CSRedisCore.ExpireAtAsync(key, expire);
     }
 }

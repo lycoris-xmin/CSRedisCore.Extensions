@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Lycoris.CSRedisCore.Extensions.Services.Impl
 {
     /// <summary>
-    /// 
+    /// Redis String 缓存操作实现，提供字符串值的增删改查、批量操作、原子增减等功能
     /// </summary>
     public sealed class RedisStringCache : IRedisStringCache
     {
@@ -17,11 +17,11 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
         private readonly string PrefixCacheKey;
 
         /// <summary>
-        /// 
+        /// 初始化 RedisStringCache 实例
         /// </summary>
-        /// <param name="CSRedisCore"></param>
-        /// <param name="JsonSetting"></param>
-        /// <param name="prefixCacheKey"></param>
+        /// <param name="CSRedisCore">CSRedis 客户端实例</param>
+        /// <param name="JsonSetting">JSON 序列化配置</param>
+        /// <param name="prefixCacheKey">缓存键前缀</param>
         public RedisStringCache(CSRedisClient CSRedisCore, JsonSerializerSettings JsonSetting, string prefixCacheKey)
         {
             this.CSRedisCore = CSRedisCore;
@@ -604,6 +604,13 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return cache;
         }
 
+        /// <summary>
+        /// 仅当 key 已存在时设置值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">值</param>
+        /// <param name="expire">过期时间</param>
+        /// <returns>是否设置成功</returns>
         public bool SetIfExists(string key, string value, TimeSpan? expire = null)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -616,6 +623,13 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return CSRedisCore.Set(key, value, 30, RedisExistence.Xx);
         }
 
+        /// <summary>
+        /// 仅当 key 已存在时设置值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">值</param>
+        /// <param name="expire">过期时间</param>
+        /// <returns>是否设置成功</returns>
         public async Task<bool> SetIfExistsAsync(string key, string value, TimeSpan? expire = null)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -628,34 +642,105 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 return await CSRedisCore.SetAsync(key, value, 30, RedisExistence.Xx);
         }
 
+        /// <summary>
+        /// 仅当 key 已存在时设置泛型对象值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">值</param>
+        /// <param name="expire">过期时间</param>
+        /// <returns>是否设置成功</returns>
         public bool SetIfExists<T>(string key, T value, TimeSpan? expire = null) where T : class
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             return SetIfExists(key, JsonConvert.SerializeObject(value, JsonSetting), expire);
         }
 
+        /// <summary>
+        /// 仅当 key 已存在时设置泛型对象值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">值</param>
+        /// <param name="expire">过期时间</param>
+        /// <returns>是否设置成功</returns>
         public async Task<bool> SetIfExistsAsync<T>(string key, T value, TimeSpan? expire = null) where T : class
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             return await SetIfExistsAsync(key, JsonConvert.SerializeObject(value, JsonSetting), expire);
         }
 
+        /// <summary>
+        /// 获取指定 key 所储存的字符串值的长度
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>字符串长度</returns>
         public long StringLength(string key) => CSRedisCore.StrLen(key);
 
+        /// <summary>
+        /// 获取指定 key 所储存的字符串值的长度
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <returns>字符串长度</returns>
         public async Task<long> StringLengthAsync(string key) => await CSRedisCore.StrLenAsync(key);
 
+        /// <summary>
+        /// 将指定的 value 追加到 key 原值的末尾
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">要追加的值</param>
+        /// <returns>追加后字符串的长度</returns>
         public long Append(string key, string value) => CSRedisCore.Append(key, value);
 
+        /// <summary>
+        /// 将指定的 value 追加到 key 原值的末尾
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">要追加的值</param>
+        /// <returns>追加后字符串的长度</returns>
         public async Task<long> AppendAsync(string key, string value) => await CSRedisCore.AppendAsync(key, value);
 
+        /// <summary>
+        /// 获取指定 key 的子字符串（按字节位置截取）
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="start">起始位置</param>
+        /// <param name="end">结束位置</param>
+        /// <returns>截取的子字符串</returns>
         public string GetRange(string key, long start, long end) => CSRedisCore.GetRange(key, start, end);
 
+        /// <summary>
+        /// 获取指定 key 的子字符串（按字节位置截取）
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="start">起始位置</param>
+        /// <param name="end">结束位置</param>
+        /// <returns>截取的子字符串</returns>
         public async Task<string> GetRangeAsync(string key, long start, long end) => await CSRedisCore.GetRangeAsync(key, start, end);
 
+        /// <summary>
+        /// 用指定的 value 覆盖 key 所储存的字符串值从偏移量 offset 开始的部分
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="offset">偏移量</param>
+        /// <param name="value">要写入的值</param>
+        /// <returns>修改后的字符串长度</returns>
         public long SetRange(string key, uint offset, string value) => CSRedisCore.SetRange(key, offset, value);
 
+        /// <summary>
+        /// 用指定的 value 覆盖 key 所储存的字符串值从偏移量 offset 开始的部分
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="offset">偏移量</param>
+        /// <param name="value">要写入的值</param>
+        /// <returns>修改后的字符串长度</returns>
         public async Task<long> SetRangeAsync(string key, uint offset, string value) => await CSRedisCore.SetRangeAsync(key, offset, value);
 
+        /// <summary>
+        /// 仅当 key 不存在时设置值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">值</param>
+        /// <param name="expire">过期时间</param>
+        /// <returns>是否设置成功</returns>
         public bool SetIfNotExists(string key, string value, TimeSpan? expire = null)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -668,6 +753,13 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
             return result;
         }
 
+        /// <summary>
+        /// 仅当 key 不存在时设置泛型对象值
+        /// </summary>
+        /// <param name="key">缓存键</param>
+        /// <param name="value">值</param>
+        /// <param name="expire">过期时间</param>
+        /// <returns>是否设置成功</returns>
         public bool SetIfNotExists<T>(string key, T value, TimeSpan? expire = null) where T : class
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -678,6 +770,68 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                 CSRedisCore.Expire(key, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
 
             return result;
+        }
+
+        /// <summary>
+        /// 获取指定 key 的原始字节值
+        /// </summary>
+        public byte[] GetBytes(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var b64 = CSRedisCore.Get(key);
+            return string.IsNullOrEmpty(b64) ? null : Convert.FromBase64String(b64);
+        }
+
+        /// <summary>
+        /// 获取指定 key 的原始字节值
+        /// </summary>
+        public async Task<byte[]> GetBytesAsync(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var b64 = await CSRedisCore.GetAsync(key);
+            return string.IsNullOrEmpty(b64) ? null : Convert.FromBase64String(b64);
+        }
+
+        /// <summary>
+        /// 设置指定 key 的原始字节值
+        /// </summary>
+        public bool SetBytes(string key, byte[] value, TimeSpan? expire = null)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var b64 = Convert.ToBase64String(value);
+
+            if (expire != null)
+                return CSRedisCore.Set(key, b64, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
+            else
+                return CSRedisCore.Set(key, b64);
+        }
+
+        /// <summary>
+        /// 设置指定 key 的原始字节值
+        /// </summary>
+        public async Task<bool> SetBytesAsync(string key, byte[] value, TimeSpan? expire = null)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var b64 = Convert.ToBase64String(value);
+
+            if (expire != null)
+                return await CSRedisCore.SetAsync(key, b64, expire.Value.Add(TimeSpan.FromSeconds(new Random().Next(1, 30))));
+            else
+                return await CSRedisCore.SetAsync(key, b64);
         }
     }
 }

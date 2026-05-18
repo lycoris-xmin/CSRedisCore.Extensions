@@ -1,7 +1,7 @@
 ﻿namespace Lycoris.CSRedisCore.Extensions.Models
 {
     /// <summary>
-    /// 
+    /// Redis INFO 命令返回的完整信息
     /// </summary>
     public class RedisInfoModel
     {
@@ -36,7 +36,7 @@
         public RedisCpuInfoModel Cpu { get; set; }
 
         /// <summary>
-        /// 
+        /// 初始化 RedisInfoModel 实例
         /// </summary>
         public RedisInfoModel()
         {

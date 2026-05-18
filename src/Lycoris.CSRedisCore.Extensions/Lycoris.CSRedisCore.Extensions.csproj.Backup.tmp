@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+		<PropertyGroup>
+			<TargetFramework>netstandard2.0</TargetFramework>
+			<_EnableDefaultWindowsPlatform>false</_EnableDefaultWindowsPlatform>
+			<RestoreProjectStyle>None</RestoreProjectStyle>
+			<RestoreConfigFile>$(MSBuildThisFileDirectory)..\..\NuGet.Config</RestoreConfigFile>
+			<GenerateDocumentationFile>True</GenerateDocumentationFile>
+			<Title>Lycoris.CSRedisCore.Extensions</Title>
+			<Version>8.0.8</Version>
+			<Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
+			<PackageIcon>
+			</PackageIcon>
+			<PackageReadmeFile>
+			</PackageReadmeFile>
+			<RepositoryUrl>https://github.com/lycoris-xmin/CSRedisCore.Extensions</RepositoryUrl>
+			<Authors>Lycoris</Authors>
+			<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		</PropertyGroup>
+		<ItemGroup>
+			<Reference Include="Microsoft.CSharp">
+				<HintPath>C:\Users\lycoris\.nuget\packages\microsoft.csharp\4.7.0\ref\netstandard2.0\Microsoft.CSharp.dll</HintPath>
+			</Reference>
+			<Reference Include="Newtonsoft.Json">
+			  <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+			</Reference>
+		</ItemGroup>
+	</Project>
