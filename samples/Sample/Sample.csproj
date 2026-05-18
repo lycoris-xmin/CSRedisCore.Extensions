@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Lycoris.CSRedisCore.Extensions.csproj" />
     <ProjectReference Include="..\..\src\Lycoris.CSRedisCore.Extensions\Lycoris.CSRedisCore.Extensions.csproj" />
   </ItemGroup>
 

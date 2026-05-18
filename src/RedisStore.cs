@@ -1,6 +1,5 @@
 ﻿using Lycoris.CSRedisCore.Extensions.JsonExtensions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
 namespace Lycoris.CSRedisCore.Extensions
