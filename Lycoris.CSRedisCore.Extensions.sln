@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DDF87A1B-5EB3-4F5D-953E-1CABBADD0061}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lycoris.CSRedisCore.Extensions", "src\Lycoris.CSRedisCore.Extensions\Lycoris.CSRedisCore.Extensions.csproj", "{AC81A6B4-5EAF-4F0B-88FC-2AC0DEA3D76E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lycoris.CSRedisCore.Extensions", "src\Lycoris.CSRedisCore.Extensions.csproj", "{AC81A6B4-5EAF-4F0B-88FC-2AC0DEA3D76E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{74D459AA-D2E5-4F20-9378-65912FA77A44}"
 EndProject

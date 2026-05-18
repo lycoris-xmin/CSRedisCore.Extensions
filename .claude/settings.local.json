@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv src/Lycoris.CSRedisCore.Extensions/CSRedisCoreBuilder.cs src/)",
+      "Bash(mv src/Lycoris.CSRedisCore.Extensions/IBaseRedisCache.cs src/)",
+      "Bash(mv src/Lycoris.CSRedisCore.Extensions/JsonExtensions src/)",
+      "Bash(mv src/Lycoris.CSRedisCore.Extensions/Lycoris.CSRedisCore.Extensions.csproj src/)",
+      "Bash(mv src/Lycoris.CSRedisCore.Extensions/Lycoris.CSRedisCore.Extensions.csproj.user src/)"
+    ]
+  }
+}
