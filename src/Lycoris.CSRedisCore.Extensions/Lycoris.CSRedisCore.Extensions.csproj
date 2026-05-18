@@ -4,12 +4,19 @@
     <LangVersion>8.0</LangVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Title>Lycoris.CSRedisCore.Extensions</Title>
-    <Version>8.0.8</Version>
+    <Version>8.1.0</Version>
     <Description>CSRedisCore二次封装，适用于不熟悉redis命令的使用</Description>
     <Authors>Lycoris</Authors>
     <RepositoryUrl>https://github.com/lycoris-xmin/CSRedisCore.Extensions</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\..\lycoris-music\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSRedisCore" Version="3.8.807" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

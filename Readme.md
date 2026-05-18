@@ -106,6 +106,10 @@ long len = await RedisCache.String.StringLengthAsync("key");
 long newLen = await RedisCache.String.AppendAsync("key", "-suffix");
 string sub = await RedisCache.String.GetRangeAsync("key", 0, 10);
 await RedisCache.String.SetRangeAsync("key", 5, "replace");
+
+// 原始字节读写（无需 JSON 序列化，适合二进制数据/二进制协议）
+await RedisCache.String.SetBytesAsync("binary", byteArray, TimeSpan.FromMinutes(5));
+byte[] bytes = await RedisCache.String.GetBytesAsync("binary");
 ```
 
 ### Hash 操作 `RedisCache.Hash`
@@ -343,7 +347,8 @@ var results = await RedisCache.Utils.PipeExecuteAsync(async pipe =>
 });
 
 // Lua 脚本
-object result = await RedisCache.Utils.RunLuaScriptAsync("return redis.call('GET', KEYS[1])", "mykey");
+object luaResult = await RedisCache.Utils.RunLuaScriptAsync(
+    "return redis.call('GET', KEYS[1])", "mykey");
 ```
 
 ### 缓存穿透防护 `RedisCacheService.CacheShell`

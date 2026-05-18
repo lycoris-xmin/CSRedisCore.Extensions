@@ -770,7 +770,7 @@ namespace Lycoris.CSRedisCore.Extensions.Services.Impl
                     ctx.DistributeResults(results);
                     return results;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw;
                 }
